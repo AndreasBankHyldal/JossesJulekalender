@@ -1,0 +1,68 @@
+import type { AdventDay } from '../data/advent'
+import type { CalendarSession } from '../types/session'
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isDay(value: unknown): value is AdventDay {
+  return isRecord(value) &&
+    typeof value.day === 'number' && Number.isInteger(value.day) && value.day >= 1 && value.day <= 24 &&
+    typeof value.title === 'string' && typeof value.message === 'string' && typeof value.littleJoy === 'string' &&
+    typeof value.theme === 'string' && ['cranberry', 'pine', 'cream', 'olive'].includes(value.theme) &&
+    typeof value.pattern === 'string' && ['stars', 'stripes', 'snow', 'plain'].includes(value.pattern) &&
+    typeof value.art === 'string' && ['bow', 'star', 'tree', 'heart', 'ornament', 'snowflake', 'gift', 'sprig'].includes(value.art)
+}
+
+function parseSession(value: unknown): CalendarSession {
+  if (
+    !isRecord(value) || (value.role !== 'josse' && value.role !== 'admin') ||
+    !Array.isArray(value.days) || value.days.length !== 24 || !value.days.every(isDay) ||
+    new Set(value.days.map((day) => day.day)).size !== 24
+  ) throw new Error('Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.')
+  return { role: value.role, days: value.days }
+}
+
+async function requestApi(method: string, body?: { username: string; password: string }, signal?: AbortSignal): Promise<unknown> {
+  let response: Response
+  try {
+    response = await fetch('/api', {
+      method,
+      credentials: 'same-origin',
+      cache: 'no-store',
+      signal,
+      ...(body ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}),
+    })
+  } catch (error) {
+    if (signal?.aborted) throw error
+    console.error('Kunne ikke kontakte loginserveren:', error)
+    throw new Error('Kunne ikke kontakte loginserveren. Kontroller forbindelsen, og prøv igen.')
+  }
+  if (method === 'GET' && response.status === 401) return null
+  let data: unknown
+  try {
+    data = await response.json()
+  } catch (error) {
+    console.error('Loginserveren sendte et uventet svar:', error)
+    throw new Error('Loginserveren kunne ikke svare korrekt. Prøv igen om lidt.')
+  }
+  if (!response.ok) {
+    throw new Error(isRecord(data) && typeof data.error === 'string'
+      ? data.error
+      : 'Der opstod en fejl. Prøv igen om lidt.')
+  }
+  return data
+}
+
+export async function getSession(signal: AbortSignal): Promise<CalendarSession | null> {
+  const data = await requestApi('GET', undefined, signal)
+  return data === null ? null : parseSession(data)
+}
+
+export async function login(username: string, password: string): Promise<CalendarSession> {
+  return parseSession(await requestApi('POST', { username, password }))
+}
+
+export async function logout(): Promise<void> {
+  await requestApi('DELETE')
+}

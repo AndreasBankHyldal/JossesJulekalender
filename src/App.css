@@ -11,6 +11,33 @@
 .wordmark-dot { color: var(--red); }
 .header-date { display: flex; align-items: center; gap: 10px; font-size: 9px; font-weight: 500; letter-spacing: 2px; color: #687365; }
 .header-date svg { width: 17px; height: 17px; color: #a28753; }
+.session-controls { display: flex; align-items: center; gap: 24px; }
+.logout-button { border: 1px solid #d6ceba; border-radius: 30px; background: transparent; padding: 8px 14px; color: var(--pine); font-size: 11px; white-space: nowrap; }
+.logout-button:hover { background: #ece9dc; }
+.logout-button:disabled { cursor: wait; opacity: .65; }
+.session-error { margin: 20px 24px 0; text-align: center; font-size: 12px; color: var(--red); }
+
+.login-page { min-height: 100svh; display: flex; flex-direction: column; }
+.login-main { position: relative; isolation: isolate; flex: 1; display: grid; place-items: center; padding: 42px 24px 50px; }
+.login-card { width: min(100%, 430px); text-align: center; }
+.login-art { width: 73px; height: 57px; color: var(--red); margin: 0 auto 15px; }
+.login-card > .eyebrow { color: var(--red); font-size: 8px; letter-spacing: 1.8px; }
+.login-card h1 { margin-top: 20px; font-family: var(--serif); font-size: clamp(48px, 5vw, 65px); line-height: .98; letter-spacing: -1.7px; font-weight: 400; }
+.login-card h1 em { color: var(--red); font-weight: 400; }
+.login-description { color: #747468; font-size: 12px; line-height: 1.8; margin-top: 21px; }
+.login-form { max-width: 325px; margin: 29px auto 0; display: flex; flex-direction: column; text-align: left; }
+.login-form label { font-size: 11px; margin-bottom: 8px; }
+.login-form input { width: 100%; padding: 13px 15px; margin-bottom: 19px; border: 1px solid #d3cdbb; border-radius: 4px; background: #fffdf773; color: var(--pine); font: inherit; font-size: 16px; }
+.login-form input:focus-visible { outline: 2px solid #a68d56; outline-offset: 2px; }
+.login-button { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 20px; border: 1px solid var(--pine); border-radius: 4px; background: var(--pine); color: var(--paper); font-size: 12px; transition: background 180ms; }
+.login-button svg { width: 17px; height: 17px; }
+.login-button:hover { background: #395845; }
+.login-button:disabled { opacity: .7; cursor: wait; }
+.login-error { color: var(--red); font-size: 11px; line-height: 1.8; margin: 0 0 16px; }
+.login-loading { margin-top: 35px; font-size: 12px; color: var(--muted); line-height: 1.8; }
+.login-signature { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--red); margin-top: 29px; }
+.login-signature svg { width: 16px; height: 16px; }
+.login-page .site-header, .login-page .site-footer { width: 100%; }
 
 .hero { position: relative; text-align: center; padding: 66px 24px 57px; isolation: isolate; }
 .eyebrow { font-size: 9px; font-weight: 500; letter-spacing: 2.3px; line-height: 1.7; }
@@ -149,6 +176,9 @@
 }
 
 @media (max-width: 760px) {
+  .session-controls .header-date { display: none; }
+  .session-controls { gap: 0; }
+  .login-main { padding-top: 34px; padding-bottom: 40px; }
   .site-header { height: 80px; padding: 0 24px; }
   .wordmark { font-size: 23px; gap: 7px; }
   .wordmark > svg { width: 35px; }

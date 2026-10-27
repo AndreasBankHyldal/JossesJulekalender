@@ -1,5 +1,13 @@
 import { expect, test } from '@playwright/test'
 import { CALENDAR_YEAR } from '../../src/lib/calendar'
+import { testAuthEnv } from '../fixtures/auth'
+
+test.beforeEach(async ({ page }) => {
+  const response = await page.request.post('/api', {
+    data: { username: testAuthEnv.JOSSE_USERNAME, password: testAuthEnv.JOSSE_PASSWORD },
+  })
+  expect(response.ok()).toBe(true)
+})
 
 test('shows 24 date-locked doors and a helpful message before December', async ({ page }) => {
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 9, 27, 12) })
