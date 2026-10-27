@@ -4,8 +4,11 @@ import {
   CALENDAR_YEAR,
   daysUntilDecember,
   getUnlockedDay,
+  getAvailableDay,
+  getProgressKey,
   parseProgress,
   serializeProgress,
+  STORAGE_KEY,
 } from '../src/lib/calendar.ts'
 import { adventDays } from '../src/data/advent.ts'
 
@@ -20,6 +23,20 @@ test('doors are locked before December of the configured year', () => {
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR - 1, 11, 24)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 9, 27)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 10, 30, 23, 59, 59)), 0)
+})
+
+test('admin can open every door regardless of the date while Josse keeps date locks', () => {
+  const beforeDecember = new Date(CALENDAR_YEAR, 9, 27)
+  const duringDecember = new Date(CALENDAR_YEAR, 11, 12)
+  assert.equal(getAvailableDay(beforeDecember, 'admin'), 24)
+  assert.equal(getAvailableDay(beforeDecember, 'josse'), 0)
+  assert.equal(getAvailableDay(duringDecember, 'admin'), 24)
+  assert.equal(getAvailableDay(duringDecember, 'josse'), 12)
+})
+
+test('admin testing has separate progress and Josse retains her existing saved doors', () => {
+  assert.equal(getProgressKey('josse'), STORAGE_KEY)
+  assert.notEqual(getProgressKey('admin'), getProgressKey('josse'))
 })
 
 test('each door unlocks at local midnight and earlier doors stay openable', () => {

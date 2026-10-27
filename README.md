@@ -6,6 +6,8 @@ En julekalender lavet med React, TypeScript og Vite. Fireogtyve illustrerede lå
 
 Brug Node.js 22.18+ (eller en aktuel Node.js 24 LTS-version).
 
+Udfyld først de to konti i den lokale `.env`-fil. `SESSION_SECRET` er allerede genereret; lad den være privat. På en ny kopi af projektet kan du kopiere `.env.example` til `.env` og generere en ny nøgle med `openssl rand -hex 32`.
+
 ```sh
 npm install
 npm run dev
@@ -13,16 +15,34 @@ npm run dev
 
 Åbn den localhost-adresse, som Vite viser.
 
+## Login og testadgang
+
+Der findes kun to konti, som du selv vælger i `.env`:
+
+| Variabel | Formål |
+| --- | --- |
+| `JOSSE_USERNAME` | Josses brugernavn |
+| `JOSSE_PASSWORD` | Josses adgangskode |
+| `ADMIN_USERNAME` | Dit brugernavn |
+| `ADMIN_PASSWORD` | Din adgangskode |
+| `SESSION_SECRET` | Tilfældig nøgle på mindst 32 tegn til at underskrive sessioner |
+
+Brug forskellige brugernavne. Josse får den almindelige kalender med datolåste låger. Dit login får **testadgang til alle 24 låger på alle datoer**, så du kan kontrollere nye ændringer. Kontiene har hver deres gemte låger i browseren, så din afprøvning ikke åbner Josses låger.
+
+Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-cookie i syv dage, og der er en knap til at logge ud. Ændrer du en kontos login eller sessionsnøglen, bliver de berørte sessioner ugyldige. Der er ingen database eller ekstern logintjeneste.
+
+`.env` og `.env.local` er ignoreret af Git; kun den tomme `.env.example` må deles. Brug aldrig `VITE_` foran brugernavne, adgangskoder eller sessionsnøglen, da den type variabler bliver offentlige i browseren. Genstart `npm run dev`, når du har ændret loginoplysningerne.
+
 ## Gør kalenderen personlig
 
 - Rediger de 24 beskeder, overskrifter og aktiviteter i `src/data/advent.ts`. De medfølgende hilsner er eksempler; erstat dem med dine egne minder, planer eller gaver.
 - Indstil årstallet i `src/lib/calendar.ts`. Åbnede låger gemmes separat for hvert år.
-- Rediger overskriften, dedikationen og navnet øverst på siden i `src/App.tsx`.
+- Rediger overskriften, dedikationen og navnet øverst på kalenderen i `src/components/Calendar.tsx`. Loginteksterne findes i `src/components/LoginPage.tsx`.
 - Farver, layout og animationer findes i `src/App.css`. Skrifttyper og juleillustrationer følger med lokalt; siden henter ikke skrifttyper eller billeder fra tredjeparter.
 
 Lågerne låses op ved midnat **i tidszonen på den besøgendes enhed**. Tidligere låger forbliver tilgængelige, også efter jul. Siden kontrollerer datoen hvert 30. sekund, når den får fokus, og hver gang der trykkes på en låge. Åbnede låger gemmes i browserens lokale lager og synkroniseres ikke mellem enheder. Fejl ved lagring vises på siden.
 
-Dette er en enkel, personlig kalender, ikke en sikker tidslås: Låger kan låses op ved at ændre enhedens ur, og alle hilsner er med i den JavaScript-kode, som browseren henter. Læg ikke adgangskoder, gavekortkoder eller andre hemmeligheder i kalenderen. Et `noindex`-metatag beder søgemaskiner om ikke at indeksere siden, men der er ingen adgangskontrol.
+Dette er en enkel, personlig kalender med login, ikke en sikker tidslås: En indlogget person kan stadig ændre enhedens ur eller undersøge de hilsner, browseren har hentet. Hilsnerne sendes kun fra `/api` efter login og ligger ikke i den offentlige JavaScript-fil. Læg alligevel ikke adgangskoder, gavekortkoder eller andre hemmeligheder i kalenderen. Et `noindex`-metatag beder desuden søgemaskiner om ikke at indeksere siden.
 
 ## Kontrol
 
@@ -32,14 +52,14 @@ npm run lint
 npm run build
 ```
 
-Browsertest bruger simulerede datoer; de tilføjer ikke en mulighed for at omgå datolåsen i appen:
+Browsertest bruger opdigtede testkonti og simulerede datoer. De bruger ikke dine rigtige adgangskoder og ændrer ikke din `.env`:
 
 ```sh
 npx playwright install chromium
 npm run test:e2e
 ```
 
-De dækker datolåsning, alle 24 lågers indhold, lagring af åbnede låger, datoskift ved midnat, lukning med tastaturet, reduceret bevægelse, lagringsfejl og mobilvisning.
+De dækker login, udlogning, forkert adgangskode, private hilsner, administratorens adgang til alle låger, Josses datolåsning, adskilt lagring, alle 24 lågers indhold, datoskift ved midnat, tastaturbetjening, reduceret bevægelse, fejl og mobilvisning.
 
 ## GitHub og arbejdsgang
 
@@ -58,11 +78,12 @@ Ved genbrug i et andet repository skal JSON-filen importeres og aktiveres under 
 
 ## Vercel Hobby (gratis)
 
-Der kræves ingen database, serverfunktioner, API-nøgler eller betalte tjenester.
+Login bruger én lille Node.js-funktion i `api/index.ts`, som kan køre på Hobby. Der kræves ingen database, API-nøgler eller betalte integrationer.
 
 1. Skub dette lokale Git-repository til et GitHub-repository.
 2. Importer repositoryet i Vercel, og vælg **Vite** som projektindstilling.
 3. Behold `npm run build` som byggekommando og `dist` som outputmappe.
-4. Udgiv siden. Der er ikke brug for miljøvariabler.
+4. Tilføj alle fem variabler fra `.env.example` under **Settings → Environment Variables** i Vercel. Brug dine egne værdier som hemmelige variabler, uden `VITE_`-præfiks. Den ignorerede lokale `.env` følger ikke automatisk med til Vercel.
+5. Udgiv siden. Udgiv igen, når du ændrer miljøvariablerne i Vercel.
 
-Siden bruger kun rodruten, så der er ikke brug for en SPA-omskrivningskonfiguration. Kør `npm run build` efterfulgt af `npm run preview` for at se produktionsversionen lokalt.
+Siden bruger rodruten og API-ruten `/api`, så der er ikke brug for en SPA-omskrivningskonfiguration. Kør `npm run build` efterfulgt af `npm run preview` for at se produktionsversionen lokalt; Vite-tilføjelsen bruger samme API-kode som Vercel-funktionen.

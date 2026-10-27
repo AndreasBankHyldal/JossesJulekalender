@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test tests/calendar.test.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "test:e2e": "npm run build && playwright test"
   },
   "dependencies": {

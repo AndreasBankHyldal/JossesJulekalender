@@ -1,3 +1,5 @@
+import type { AccountRole } from '../types/session.ts'
+
 export const CALENDAR_YEAR = 2026
 export const STORAGE_KEY = `josses-advent:${CALENDAR_YEAR}:v1`
 
@@ -6,6 +8,14 @@ export function getUnlockedDay(now: Date, year = CALENDAR_YEAR): number {
   if (now.getFullYear() > year) return 24
   if (now.getMonth() < 11) return 0
   return Math.min(now.getDate(), 24)
+}
+
+export function getAvailableDay(now: Date, role: AccountRole): number {
+  return role === 'admin' ? 24 : getUnlockedDay(now)
+}
+
+export function getProgressKey(role: AccountRole): string {
+  return role === 'admin' ? `${STORAGE_KEY}:admin` : STORAGE_KEY
 }
 
 export function daysUntilDecember(now: Date, year = CALENDAR_YEAR): number {
