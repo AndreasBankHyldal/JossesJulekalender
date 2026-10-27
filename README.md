@@ -41,6 +41,21 @@ npm run test:e2e
 
 De dækker datolåsning, alle 24 lågers indhold, lagring af åbnede låger, datoskift ved midnat, lukning med tastaturet, reduceret bevægelse, lagringsfejl og mobilvisning.
 
+## GitHub og arbejdsgang
+
+Lav ændringer på en separat gren, f.eks. `initial-calender`, og opret en pull request mod `main`. Skub ikke ændringer direkte til `main`.
+
+GitHub Actions kører automatisk på PR'er mod `main` og efter sammenfletning til `main`:
+
+- **Kvalitet:** installation fra låsefilen, lint uden advarsler, enhedstest, TypeScript-kontrol og produktionsbygning.
+- **Browsertest:** produktionsbygning og Playwright-test på computer og mobil. Fejlspor gemmes i syv dage.
+
+Kørsler har tidsgrænser, læseadgang til koden og ingen adgang til Vercel-hemmeligheder. Ældre kørsler annulleres, når der kommer nye ændringer til samme PR. Dependabot opretter ugentlige PR'er for npm- og GitHub Actions-opdateringer.
+
+Regelsættet **Beskyt main** er aktiveret på GitHub for `main`; `.github/rulesets/main.json` indeholder samme opsætning til dokumentation og genbrug. Det kræver PR'er, godkendte `Kvalitet`- og `Browsertest`-kontroller, en opdateret PR-gren og afsluttede gennemgangstråde. Det forbyder direkte skub, tvungne skub og sletning af `main`, også for administratorer. Der kræves ikke godkendelse fra en ekstra person.
+
+Ved genbrug i et andet repository skal JSON-filen importeres og aktiveres under **Settings → Rules → Rulesets**; filen håndhæver ikke reglerne alene. Et helt tomt repository skal have en indledende `main`-gren, før der kan oprettes PR'er mod den. Statuskontroller kræves ikke ved selve oprettelsen af grenen, så den første engangsopsætning er mulig.
+
 ## Vercel Hobby (gratis)
 
 Der kræves ingen database, serverfunktioner, API-nøgler eller betalte tjenester.
