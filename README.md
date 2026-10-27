@@ -31,6 +31,8 @@ Brug forskellige brugernavne. Josse får den almindelige kalender med datolåste
 
 Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-cookie i syv dage, og der er en knap til at logge ud. Ændrer du en kontos login eller sessionsnøglen, bliver de berørte sessioner ugyldige. Der er ingen database eller ekstern logintjeneste.
 
+**Login vises først, hver gang siden åbnes eller genindlæses**, også i en ny fane og selv med en eksisterende sessionscookie. Kalenderen vises og hilsnerne hentes først, når loginformularen er sendt og godkendt. Der er ingen automatisk genindlogning; gemte åbnede låger bevares efter næste login.
+
 `.env` og `.env.local` er ignoreret af Git; kun den tomme `.env.example` må deles. Brug aldrig `VITE_` foran brugernavne, adgangskoder eller sessionsnøglen, da den type variabler bliver offentlige i browseren. Genstart `npm run dev`, når du har ændret loginoplysningerne.
 
 ## Gør kalenderen personlig

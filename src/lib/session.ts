@@ -23,22 +23,19 @@ function parseSession(value: unknown): CalendarSession {
   return { role: value.role, days: value.days }
 }
 
-async function requestApi(method: string, body?: { username: string; password: string }, signal?: AbortSignal): Promise<unknown> {
+async function requestApi(method: 'POST' | 'DELETE', body?: { username: string; password: string }): Promise<unknown> {
   let response: Response
   try {
     response = await fetch('/api', {
       method,
       credentials: 'same-origin',
       cache: 'no-store',
-      signal,
       ...(body ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}),
     })
   } catch (error) {
-    if (signal?.aborted) throw error
     console.error('Kunne ikke kontakte loginserveren:', error)
     throw new Error('Kunne ikke kontakte loginserveren. Kontroller forbindelsen, og prøv igen.')
   }
-  if (method === 'GET' && response.status === 401) return null
   let data: unknown
   try {
     data = await response.json()
@@ -52,11 +49,6 @@ async function requestApi(method: string, body?: { username: string; password: s
       : 'Der opstod en fejl. Prøv igen om lidt.')
   }
   return data
-}
-
-export async function getSession(signal: AbortSignal): Promise<CalendarSession | null> {
-  const data = await requestApi('GET', undefined, signal)
-  return data === null ? null : parseSession(data)
 }
 
 export async function login(username: string, password: string): Promise<CalendarSession> {

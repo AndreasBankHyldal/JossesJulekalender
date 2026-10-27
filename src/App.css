@@ -34,7 +34,6 @@
 .login-button:hover { background: #395845; }
 .login-button:disabled { opacity: .7; cursor: wait; }
 .login-error { color: var(--red); font-size: 11px; line-height: 1.8; margin: 0 0 16px; }
-.login-loading { margin-top: 35px; font-size: 12px; color: var(--muted); line-height: 1.8; }
 .login-signature { display: flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--serif); font-size: 24px; font-style: italic; color: var(--red); margin-top: 29px; }
 .login-signature svg { width: 16px; height: 16px; }
 .login-page .site-header, .login-page .site-footer { width: 100%; }
