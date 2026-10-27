@@ -72,7 +72,7 @@ function App() {
 
     if (day.day > getUnlockedDay(currentTime)) {
       setNotice((previous) => ({
-        message: `Lidt tålmodighed, min skat. Låge ${day.day} åbner den ${day.day}. december ${CALENDAR_YEAR}.`,
+        message: `Lidt tålmodighed, goffe. Låge ${day.day} åbner den ${day.day}. december ${CALENDAR_YEAR}.`,
         id: (previous?.id ?? 0) + 1,
       }))
       return
@@ -197,7 +197,7 @@ function App() {
           <span className="love-note-line" />
           <ChristmasArt kind="heart" />
           <span className="love-note-line" />
-          <p>Fordi du gør alle årstider lidt mere magiske.</p>
+          <p>Fordi jeg elsker dig og fordi, du gør hver dag lidt bedre.</p>
           <span className="love-note-signature">Altid med kærlighed</span>
         </section>
       </main>

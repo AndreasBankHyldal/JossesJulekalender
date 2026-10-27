@@ -8,7 +8,7 @@ test('shows 24 date-locked doors and a helpful message before December', async (
   await expect(page.locator('.calendar-door[aria-disabled="true"]')).toHaveCount(24)
   await expect(page.getByText('35 nætter til den første lille overraskelse')).toBeVisible()
   await page.getByRole('button', { name: '1. december, låst indtil den 1. december', exact: true }).click({ force: true })
-  await expect(page.getByText(`Lidt tålmodighed, min skat. Låge 1 åbner den 1. december ${CALENDAR_YEAR}.`)).toBeVisible()
+  await expect(page.getByText(`Låge 1 åbner den 1. december ${CALENDAR_YEAR}.`)).toBeVisible()
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 

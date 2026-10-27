@@ -1,0 +1,78 @@
+name: PR-kontrol
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-kontrol-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Kvalitet
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Opsæt Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Installer afhængigheder
+        run: npm ci
+
+      - name: Kontroller kodekvalitet
+        run: npm run lint -- --deny-warnings
+
+      - name: Kør enhedstest
+        run: npm test
+
+      - name: Kontroller typer og byg produktionsversionen
+        run: npm run build
+
+  browser-tests:
+    name: Browsertest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Opsæt Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Installer afhængigheder
+        run: npm ci
+
+      - name: Installer Chromium og systemafhængigheder
+        run: npx playwright install --with-deps chromium
+
+      - name: Byg og test kalenderen på computer og mobil
+        run: npm run test:e2e -- --workers=2
+
+      - name: Gem fejlspor
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: playwright-fejlspor
+          path: test-results/
+          if-no-files-found: ignore
+          retention-days: 7
