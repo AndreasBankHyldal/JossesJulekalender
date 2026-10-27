@@ -1,17 +1,11 @@
 import { expect, test } from '@playwright/test'
 import { CALENDAR_YEAR } from '../../src/lib/calendar'
-import { testAuthEnv } from '../fixtures/auth'
-
-test.beforeEach(async ({ page }) => {
-  const response = await page.request.post('/api', {
-    data: { username: testAuthEnv.JOSSE_USERNAME, password: testAuthEnv.JOSSE_PASSWORD },
-  })
-  expect(response.ok()).toBe(true)
-})
+import { signIn } from './sign-in'
 
 test('shows 24 date-locked doors and a helpful message before December', async ({ page }) => {
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 9, 27, 12) })
   await page.goto('/')
+  await signIn(page, 'josse')
   await expect(page.getByRole('button', { name: /^\d+\. december, / })).toHaveCount(24)
   await expect(page.locator('.calendar-door[aria-disabled="true"]')).toHaveCount(24)
   await expect(page.getByText('35 nætter til den første lille overraskelse')).toBeVisible()
@@ -23,6 +17,7 @@ test('shows 24 date-locked doors and a helpful message before December', async (
 test('opens into an almost-full-page reveal, traps focus, dismisses, and remembers progress', async ({ page }) => {
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 12, 12) })
   await page.goto('/')
+  await signIn(page, 'josse')
   await expect(page.locator('.calendar-door[aria-disabled="false"]')).toHaveCount(12)
   const door = page.getByRole('button', { name: '3. december, åbn din overraskelse', exact: true })
   await door.click()
@@ -51,6 +46,7 @@ test('opens into an almost-full-page reveal, traps focus, dismisses, and remembe
   await expect(dialog).toHaveCount(0)
   await expect(page.getByRole('button', { name: '3. december, åbnet, læs igen', exact: true })).toBeFocused()
   await page.reload()
+  await signIn(page, 'josse')
   await expect(page.getByText('1 af 24 små glæder', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: '3. december, åbnet, læs igen', exact: true }).click()
   await page.getByRole('button', { name: 'Tilbage til vores december' }).click()
@@ -61,6 +57,7 @@ test('all 24 doors reveal their own content on Christmas Eve with reduced motion
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 24, 12) })
   await page.goto('/')
+  await signIn(page, 'josse')
   const titles = new Set<string>()
   for (let day = 1; day <= 24; day++) {
     await page.getByRole('button', { name: `${day}. december, åbn din overraskelse`, exact: true }).click()
@@ -79,6 +76,7 @@ test('all 24 doors reveal their own content on Christmas Eve with reduced motion
 test('unlocks the next door when the page stays open over midnight', async ({ page }) => {
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 1, 23, 59, 50) })
   await page.goto('/')
+  await signIn(page, 'josse')
   await expect(page.locator('.calendar-door[aria-disabled="false"]')).toHaveCount(1)
   await page.clock.fastForward(31_000)
   await expect(page.locator('.calendar-door[aria-disabled="false"]')).toHaveCount(2)
@@ -88,6 +86,7 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 24, 12) })
   await page.goto('/')
+  await signIn(page, 'josse')
   for (const viewport of [
     { width: 320, height: 568 },
     { width: 768, height: 1024 },
@@ -113,6 +112,7 @@ test('shows a real warning when saving is unavailable but still opens the door',
     Storage.prototype.setItem = () => { throw new DOMException('Storage blocked', 'SecurityError') }
   })
   await page.goto('/')
+  await signIn(page, 'josse')
   await page.getByRole('button', { name: '1. december, åbn din overraskelse', exact: true }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await page.keyboard.press('Escape')

@@ -1,20 +1,8 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
-import type { Page } from '@playwright/test'
 import { CALENDAR_YEAR } from '../../src/lib/calendar'
 import { testAuthEnv } from '../fixtures/auth'
-
-async function signIn(page: Page, role: 'josse' | 'admin') {
-  await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
-  await page.getByLabel('Brugernavn', { exact: true }).fill(
-    role === 'admin' ? testAuthEnv.ADMIN_USERNAME : testAuthEnv.JOSSE_USERNAME,
-  )
-  await page.getByLabel('Adgangskode', { exact: true }).fill(
-    role === 'admin' ? testAuthEnv.ADMIN_PASSWORD : testAuthEnv.JOSSE_PASSWORD,
-  )
-  await page.getByRole('button', { name: 'Åbn vores december' }).click()
-  await expect(page.locator('.calendar-grid')).toBeVisible()
-}
+import { signIn } from './sign-in'
 
 test('anonymous visitors see only login and cannot fetch private notes', async ({ page, request }) => {
   await page.goto('/')
@@ -44,7 +32,40 @@ test('wrong credentials show a Danish error without exposing the calendar', asyn
   await expect(page.locator('.calendar-door')).toHaveCount(0)
 })
 
-test('admin can open all 24 doors before December and stays logged in after reload', async ({ page }) => {
+for (const role of ['josse', 'admin'] as const) {
+  test(`a saved ${role} session still starts at login on a fresh page`, async ({ page, context }) => {
+    const response = await page.request.post('/api', {
+      data: {
+        username: role === 'admin' ? testAuthEnv.ADMIN_USERNAME : testAuthEnv.JOSSE_USERNAME,
+        password: role === 'admin' ? testAuthEnv.ADMIN_PASSWORD : testAuthEnv.JOSSE_PASSWORD,
+      },
+    })
+    expect(response.ok()).toBe(true)
+    const apiRequests: string[] = []
+    page.on('request', (request) => {
+      if (new URL(request.url()).pathname === '/api') apiRequests.push(request.method())
+    })
+
+    await page.goto('/')
+    await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
+    await expect(page.locator('.calendar-door')).toHaveCount(0)
+    expect(apiRequests).toEqual([])
+    await signIn(page, role)
+
+    const newTab = await context.newPage()
+    await newTab.goto('/')
+    await expect(newTab.getByLabel('Brugernavn', { exact: true })).toBeVisible()
+    await expect(newTab.locator('.calendar-door')).toHaveCount(0)
+    await newTab.close()
+
+    await page.reload()
+    await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
+    await expect(page.locator('.calendar-door')).toHaveCount(0)
+    await signIn(page, role)
+  })
+}
+
+test('admin can open all 24 doors before December and progress survives logging in again', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 9, 27, 12) })
   await page.goto('/')
@@ -57,6 +78,7 @@ test('admin can open all 24 doors before December and stays logged in after relo
     await page.keyboard.press('Escape')
   }
   await page.reload()
+  await signIn(page, 'admin')
   await expect(page.getByText('24 af 24 små glæder', { exact: true })).toBeVisible()
 })
 

@@ -4,10 +4,8 @@ import { login } from '../lib/session'
 import type { CalendarSession } from '../types/session'
 import { ChristmasArt, Icon, PineBranch } from './ChristmasArt'
 
-export function LoginPage({ onLogin, loadingSession, sessionError }: {
+export function LoginPage({ onLogin }: {
   onLogin: (session: CalendarSession) => void
-  loadingSession: boolean
-  sessionError: string | null
 }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -46,20 +44,18 @@ export function LoginPage({ onLogin, loadingSession, sessionError }: {
           <p className="eyebrow">EN LILLE HEMMELIGHED. KUN FOR OS.</p>
           <h1 id="login-title">Lidt julemagi<br /><em>venter på dig.</em></h1>
           <p className="login-description">Log ind, og træd indenfor i vores lille december.</p>
-          {loadingSession ? <p className="login-loading" role="status">Et øjeblik, vi finder din kalender…</p> : (
-            <form className="login-form" onSubmit={submit}>
-              <label htmlFor="username">Brugernavn</label>
-              <input id="username" name="username" autoComplete="username" required maxLength={128}
-                value={username} onChange={(event) => setUsername(event.target.value)} />
-              <label htmlFor="password">Adgangskode</label>
-              <input id="password" name="password" type="password" autoComplete="current-password" required maxLength={512}
-                value={password} onChange={(event) => setPassword(event.target.value)} />
-              {error || sessionError ? <p className="login-error" role="alert">{error ?? sessionError}</p> : null}
-              <button type="submit" className="login-button" disabled={submitting}>
-                <Icon name="lock" /> {submitting ? 'Logger ind…' : 'Åbn vores december'}
-              </button>
-            </form>
-          )}
+          <form className="login-form" onSubmit={submit}>
+            <label htmlFor="username">Brugernavn</label>
+            <input id="username" name="username" autoComplete="username" required maxLength={128}
+              value={username} onChange={(event) => setUsername(event.target.value)} />
+            <label htmlFor="password">Adgangskode</label>
+            <input id="password" name="password" type="password" autoComplete="current-password" required maxLength={512}
+              value={password} onChange={(event) => setPassword(event.target.value)} />
+            {error ? <p className="login-error" role="alert">{error}</p> : null}
+            <button type="submit" className="login-button" disabled={submitting}>
+              <Icon name="lock" /> {submitting ? 'Logger ind…' : 'Åbn vores december'}
+            </button>
+          </form>
           <p className="login-signature">Altid med kærlighed <Icon name="heart" /></p>
         </section>
       </main>
