@@ -15,37 +15,6 @@ npm run dev
 
 Åbn den localhost-adresse, som Vite viser.
 
-## Login og testadgang
-
-Der findes kun to konti, som du selv vælger i `.env`:
-
-| Variabel | Formål |
-| --- | --- |
-| `JOSSE_USERNAME` | Josses brugernavn |
-| `JOSSE_PASSWORD` | Josses adgangskode |
-| `ADMIN_USERNAME` | Dit brugernavn |
-| `ADMIN_PASSWORD` | Din adgangskode |
-| `SESSION_SECRET` | Tilfældig nøgle på mindst 32 tegn til at underskrive sessioner |
-
-Brug forskellige brugernavne. Josse får den almindelige kalender med datolåste låger. Dit login får **testadgang til alle 24 låger på alle datoer**, så du kan kontrollere nye ændringer. Kontiene har hver deres gemte låger i browseren, så din afprøvning ikke åbner Josses låger.
-
-Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-cookie i syv dage, og der er en knap til at logge ud. Ændrer du en kontos login eller sessionsnøglen, bliver de berørte sessioner ugyldige. Der er ingen database eller ekstern logintjeneste.
-
-**Login vises først, hver gang siden åbnes eller genindlæses**, også i en ny fane og selv med en eksisterende sessionscookie. Kalenderen vises og hilsnerne hentes først, når loginformularen er sendt og godkendt. Der er ingen automatisk genindlogning; gemte åbnede låger bevares efter næste login.
-
-`.env` og `.env.local` er ignoreret af Git; kun den tomme `.env.example` må deles. Brug aldrig `VITE_` foran brugernavne, adgangskoder eller sessionsnøglen, da den type variabler bliver offentlige i browseren. Genstart `npm run dev`, når du har ændret loginoplysningerne.
-
-## Gør kalenderen personlig
-
-- Rediger de 24 beskeder, overskrifter og aktiviteter i `src/data/advent.ts`. De medfølgende hilsner er eksempler; erstat dem med dine egne minder, planer eller gaver.
-- Indstil årstallet i `src/lib/calendar.ts`. Åbnede låger gemmes separat for hvert år.
-- Rediger overskriften, dedikationen og navnet øverst på kalenderen i `src/components/Calendar.tsx`. Loginteksterne findes i `src/components/LoginPage.tsx`.
-- Farver, layout og animationer findes i `src/App.css`. Skrifttyper og juleillustrationer følger med lokalt; siden henter ikke skrifttyper eller billeder fra tredjeparter.
-
-Lågerne låses op ved midnat **i tidszonen på den besøgendes enhed**. Tidligere låger forbliver tilgængelige, også efter jul. Siden kontrollerer datoen hvert 30. sekund, når den får fokus, og hver gang der trykkes på en låge. Åbnede låger gemmes i browserens lokale lager og synkroniseres ikke mellem enheder. Fejl ved lagring vises på siden.
-
-Dette er en enkel, personlig kalender med login, ikke en sikker tidslås: En indlogget person kan stadig ændre enhedens ur eller undersøge de hilsner, browseren har hentet. Hilsnerne sendes kun fra `/api` efter login og ligger ikke i den offentlige JavaScript-fil. Læg alligevel ikke adgangskoder, gavekortkoder eller andre hemmeligheder i kalenderen. Et `noindex`-metatag beder desuden søgemaskiner om ikke at indeksere siden.
-
 ## Kontrol
 
 ```sh
