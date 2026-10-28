@@ -29,9 +29,9 @@ export const adventDays: AdventDay[] = [
     message: 'Jeg har gemt et lille brev til dig. Åbn det, og lad vores december begynde.',
     littleJoy: 'Én lille ting fra mig hver dag. Ingen krav, intet du skal nå. Bare lidt ekstra kærlighed.',
     letter: {
-      greeting: 'Kære Josse',
+      greeting: 'Hej Mousis',
       paragraphs: [
-        'Velkommen til vores december. Jeg har lavet denne lille kalender til dig, fordi jeg gerne vil give dig lidt ekstra kærlighed midt i alt det, december også rummer.',
+        'Velkommen til din julekalender hehe. Jeg har lavet en lille kalender til dig, fordi jeg gerne vil give dig lidt ekstra kærlighed midt i alt det, december også rummer.',
         'Bag hver låge venter en lille ting fra mig: en kærlig hilsen, en hyggelig stund, lidt sjov eller en overraskelse. Nogle ting er til os sammen, og andre er bare til dig.',
         'Du skal ikke nå noget bestemt. Der er ingen opgaver, du skal leve op til, og du behøver ikke åbne en låge hver dag. Kig ind, når du har lyst og overskud. Alt det hyggelige kan vente, til det passer dig.',
         'Jeg glæder mig til at dele de små øjeblikke med dig. Du er mit yndlingsmenneske, i december og alle årets andre måneder.',
