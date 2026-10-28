@@ -1,8 +1,16 @@
-import type { AdventDay } from '../data/advent'
+import type { AdventDay, AdventLetter } from '../data/advent'
 import type { CalendarSession } from '../types/session'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
+}
+
+function isLetter(value: unknown): value is AdventLetter {
+  return isRecord(value) &&
+    typeof value.greeting === 'string' && value.greeting.trim().length > 0 &&
+    Array.isArray(value.paragraphs) && value.paragraphs.length > 0 &&
+    value.paragraphs.every((paragraph) => typeof paragraph === 'string' && paragraph.trim().length > 0) &&
+    typeof value.signature === 'string' && value.signature.trim().length > 0
 }
 
 function isDay(value: unknown): value is AdventDay {
@@ -11,7 +19,8 @@ function isDay(value: unknown): value is AdventDay {
     typeof value.title === 'string' && typeof value.message === 'string' && typeof value.littleJoy === 'string' &&
     typeof value.theme === 'string' && ['cranberry', 'pine', 'cream', 'olive'].includes(value.theme) &&
     typeof value.pattern === 'string' && ['stars', 'stripes', 'snow', 'plain'].includes(value.pattern) &&
-    typeof value.art === 'string' && ['bow', 'star', 'tree', 'heart', 'ornament', 'snowflake', 'gift', 'sprig'].includes(value.art)
+    typeof value.art === 'string' && ['bow', 'star', 'tree', 'heart', 'ornament', 'snowflake', 'gift', 'sprig'].includes(value.art) &&
+    (value.letter === undefined || isLetter(value.letter))
 }
 
 function parseSession(value: unknown): CalendarSession {
