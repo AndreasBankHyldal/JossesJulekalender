@@ -2,6 +2,12 @@ export type ChristmasArtKind = 'bow' | 'star' | 'tree' | 'heart' | 'ornament' | 
 type Theme = 'cranberry' | 'pine' | 'cream' | 'olive'
 type Pattern = 'stars' | 'stripes' | 'snow' | 'plain'
 
+export type AdventLetter = {
+  greeting: string
+  paragraphs: string[]
+  signature: string
+}
+
 export type AdventDay = {
   day: number
   theme: Theme
@@ -10,10 +16,29 @@ export type AdventDay = {
   title: string
   message: string
   littleJoy: string
+  letter?: AdventLetter
 }
 
 export const adventDays: AdventDay[] = [
-  { day: 1, theme: 'cranberry', pattern: 'stars', art: 'bow', title: 'Det bedste ved december', message: 'Det er hverken lysene, gaverne eller julesmåkagerne. Det er at få lov til at dele det hele med dig. Lad det blive en december fuld af vores helt egen lille slags magi.', littleJoy: 'Lad os lave varm kakao og sætte vores yndlingsjulefilm på.' },
+  {
+    day: 1,
+    theme: 'cranberry',
+    pattern: 'stars',
+    art: 'bow',
+    title: 'Velkommen til december',
+    message: 'Jeg har gemt et lille brev til dig. Åbn det, og lad vores december begynde.',
+    littleJoy: 'Én lille ting fra mig hver dag. Ingen krav, intet du skal nå. Bare lidt ekstra kærlighed.',
+    letter: {
+      greeting: 'Kære Josse',
+      paragraphs: [
+        'Velkommen til vores december. Jeg har lavet denne lille kalender til dig, fordi jeg gerne vil give dig lidt ekstra kærlighed midt i alt det, december også rummer.',
+        'Bag hver låge venter en lille ting fra mig: en kærlig hilsen, en hyggelig stund, lidt sjov eller en overraskelse. Nogle ting er til os sammen, og andre er bare til dig.',
+        'Du skal ikke nå noget bestemt. Der er ingen opgaver, du skal leve op til, og du behøver ikke åbne en låge hver dag. Kig ind, når du har lyst og overskud. Alt det hyggelige kan vente, til det passer dig.',
+        'Jeg glæder mig til at dele de små øjeblikke med dig. Du er mit yndlingsmenneske, i december og alle årets andre måneder.',
+      ],
+      signature: 'Altid med kærlighed',
+    },
+  },
   { day: 2, theme: 'cream', pattern: 'plain', art: 'sprig', title: 'En stille morgen', message: 'Midt i al juletravlheden kommer her en lille påmindelse: Vi behøver ikke skynde os gennem de dejlige øjeblikke. Især ikke dem, vi får lov til at dele.', littleJoy: 'Noget varmt at drikke, et blødt tæppe og lidt ekstra tid sammen.' },
   { day: 3, theme: 'pine', pattern: 'snow', art: 'star', title: 'Du lyser min verden op', message: 'Nogle mennesker gør en helt almindelig dag særlig bare ved at være en del af den. Sådan er du for mig. Min lille smule jul i hverdagen.', littleJoy: 'Lad os gå en tur og finde de smukkeste julelys.' },
   { day: 4, theme: 'olive', pattern: 'stripes', art: 'ornament', title: 'Perfekt på vores måde', message: 'En perfekt planlagt aften er dejlig. Men en aften uden planer sammen med dig? Det er som regel min favorit. Det bedste er at være sammen.', littleJoy: 'Du vælger aftensmaden i dag. Jeg tager mig af resten.' },

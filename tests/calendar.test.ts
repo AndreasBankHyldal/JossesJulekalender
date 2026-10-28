@@ -19,6 +19,15 @@ test('all 24 days have unique numbers and complete starter content', () => {
   }
 })
 
+test('December 1 has a complete editable welcome letter', () => {
+  const { letter } = adventDays[0]
+  assert.ok(letter)
+  assert.ok(letter.greeting.trim())
+  assert.ok(letter.paragraphs.length > 0)
+  assert.ok(letter.paragraphs.every((paragraph) => paragraph.trim().length > 0))
+  assert.ok(letter.signature.trim())
+})
+
 test('doors are locked before December of the configured year', () => {
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR - 1, 11, 24)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 9, 27)), 0)

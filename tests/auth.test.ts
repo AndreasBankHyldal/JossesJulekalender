@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { handleApi } from '../server/api.ts'
+import { adventDays } from '../src/data/advent.ts'
 import {
   authenticate, AuthConfigurationError, createSession,
   readAuthConfig, SESSION_COOKIE, SESSION_SECONDS, verifySession,
@@ -70,6 +71,7 @@ test('login sets a private secure cookie; the session restores without exposing 
   const data = await response.json()
   assert.equal(data.role, 'admin')
   assert.equal(data.days.length, 24)
+  assert.deepEqual(data.days[0].letter, adventDays[0].letter)
   assert.equal(JSON.stringify(data).includes(testAuthEnv.ADMIN_PASSWORD), false)
   assert.equal(JSON.stringify(data).includes(testAuthEnv.SESSION_SECRET), false)
   const restored = await handleApi(new Request('https://calendar.test/api', {

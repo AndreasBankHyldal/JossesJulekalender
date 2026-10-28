@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { expect, test } from '@playwright/test'
 import { CALENDAR_YEAR } from '../../src/lib/calendar'
+import { adventDays } from '../../src/data/advent'
 import { testAuthEnv } from '../fixtures/auth'
 import { signIn } from './sign-in'
 
@@ -10,16 +11,19 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
   await expect(page.locator('.calendar-door')).toHaveCount(0)
   const response = await request.get('/api')
   expect(response.status()).toBe(401)
-  expect(await response.text()).not.toContain('Det bedste ved december')
+  const privateContent = [adventDays[0].title, ...(adventDays[0].letter?.paragraphs ?? [])]
+  const anonymousBody = await response.text()
+  for (const privateText of privateContent) expect(anonymousBody).not.toContain(privateText)
   const scripts = readdirSync('dist/assets').filter((name) => name.endsWith('.js'))
     .map((name) => readFileSync(`dist/assets/${name}`, 'utf8')).join('\n')
-  for (const privateText of ['Det bedste ved december', ...Object.values(testAuthEnv)]) {
+  for (const privateText of [...privateContent, ...Object.values(testAuthEnv)]) {
     expect(scripts).not.toContain(privateText)
   }
   for (const secretFile of ['/.env', '/server/auth.ts', '/src/data/advent.ts']) {
     const source = await request.get(secretFile)
-    expect(await source.text()).not.toContain(testAuthEnv.SESSION_SECRET)
-    expect(await source.text()).not.toContain('Det bedste ved december')
+    const body = await source.text()
+    expect(body).not.toContain(testAuthEnv.SESSION_SECRET)
+    for (const privateText of privateContent) expect(body).not.toContain(privateText)
   }
 })
 

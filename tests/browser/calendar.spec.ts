@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { CALENDAR_YEAR } from '../../src/lib/calendar'
+import { adventDays } from '../../src/data/advent'
 import { signIn } from './sign-in'
 
 test('shows 24 date-locked doors and a helpful message before December', async ({ page }) => {
@@ -53,6 +54,63 @@ test('opens into an almost-full-page reveal, traps focus, dismisses, and remembe
   await expect(page.getByRole('dialog')).toHaveCount(0)
 })
 
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`December 1 opens a welcome letter and can be reread with ${reducedMotion} motion`, async ({ page }) => {
+    const welcomeLetter = adventDays[0].letter
+    if (!welcomeLetter) throw new Error('December 1 must have a welcome letter')
+    await page.emulateMedia({ reducedMotion })
+    await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 1, 12) })
+    await page.goto('/')
+    await signIn(page, 'josse')
+    await page.getByRole('button', { name: '1. december, åbn din overraskelse', exact: true }).click()
+    const dialog = page.getByRole('dialog')
+    const letter = dialog.getByRole('article', { name: 'Dit decemberbrev', includeHidden: true })
+    await expect(dialog.getByRole('heading', { name: 'Velkommen til december' })).toBeVisible()
+    await expect(letter).toBeHidden()
+    const openButton = dialog.getByRole('button', { name: 'Åbn dit brev', exact: true })
+    await expect(openButton).toHaveAttribute('aria-expanded', 'false')
+    await expect(dialog.getByRole('button', { name: 'Luk og vend tilbage til kalenderen' })).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(openButton).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(letter).toBeVisible()
+    await expect(dialog.getByRole('button', { name: 'Fold brevet sammen' })).toHaveAttribute('aria-expanded', 'true')
+    for (const paragraph of welcomeLetter.paragraphs) {
+      await expect(letter.getByText(paragraph, { exact: true })).toBeVisible()
+    }
+    await page.clock.fastForward(10_000)
+    await expect(letter).toHaveCSS('opacity', '1')
+    if (reducedMotion === 'reduce') {
+      expect(await dialog.locator('.welcome-snow > span').evaluateAll((flakes) =>
+        flakes.every((flake) => getComputedStyle(flake).animationName === 'none'),
+      )).toBe(true)
+      const duration = await dialog.locator('.welcome-envelope-flap').evaluate((flap) =>
+        parseFloat(getComputedStyle(flap).transitionDuration),
+      )
+      expect(duration).toBeLessThan(.001)
+    } else {
+      await expect(dialog.locator('.welcome-envelope-flap')).toHaveCSS('transition-duration', '0.65s')
+    }
+    await dialog.getByRole('button', { name: 'Fold brevet sammen' }).click()
+    await expect(letter).toBeHidden()
+    await openButton.click()
+    await expect(letter).toBeVisible()
+    await dialog.getByRole('button', { name: 'Tilbage til vores december' }).focus()
+    await page.keyboard.press('Tab')
+    await expect(dialog.getByRole('button', { name: 'Luk og vend tilbage til kalenderen' })).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toHaveCount(0)
+    await expect(page.getByRole('button', { name: '1. december, åbnet, læs igen', exact: true })).toBeFocused()
+    await page.reload()
+    await signIn(page, 'josse')
+    await page.getByRole('button', { name: '1. december, åbnet, læs igen', exact: true }).click()
+    await expect(letter).toBeHidden()
+    await openButton.click()
+    await expect(letter).toBeVisible()
+    await expect(letter.getByText(welcomeLetter.signature, { exact: true })).toBeVisible()
+  })
+}
+
 test('all 24 doors reveal their own content on Christmas Eve with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 24, 12) })
@@ -94,15 +152,26 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
   ]) {
     await page.setViewportSize(viewport)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    await page.getByRole('button', { name: /^24\. december, / }).click()
-    const dialog = page.getByRole('dialog')
-    const box = await dialog.boundingBox()
-    expect(box!.width / viewport.width).toBeGreaterThan(.9)
-    expect(box!.height / viewport.height).toBeGreaterThan(.85)
-    expect(box!.x).toBeGreaterThanOrEqual(0)
-    expect(box!.y).toBeGreaterThanOrEqual(0)
-    await dialog.getByRole('button', { name: 'Tilbage til vores december' }).click()
-    await expect(dialog).toHaveCount(0)
+    for (const day of [1, 24]) {
+      await page.getByRole('button', { name: new RegExp(`^${day}\\. december, `) }).click()
+      const dialog = page.getByRole('dialog')
+      const box = await dialog.boundingBox()
+      expect(box!.width / viewport.width).toBeGreaterThan(.9)
+      expect(box!.height / viewport.height).toBeGreaterThan(.85)
+      expect(box!.x).toBeGreaterThanOrEqual(0)
+      expect(box!.y).toBeGreaterThanOrEqual(0)
+      if (day === 1) {
+        await dialog.getByRole('button', { name: 'Åbn dit brev', exact: true }).click()
+        const letter = dialog.getByRole('article', { name: 'Dit decemberbrev' })
+        await expect(letter).toBeVisible()
+        const letterBox = await letter.boundingBox()
+        expect(letterBox!.x).toBeGreaterThanOrEqual(box!.x)
+        expect(letterBox!.x + letterBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
+        expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
+      }
+      await dialog.getByRole('button', { name: 'Tilbage til vores december' }).click()
+      await expect(dialog).toHaveCount(0)
+    }
   }
 })
 
