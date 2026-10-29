@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { AdventDay } from '../data/advent'
 import { ChristmasArt, Icon } from './ChristmasArt'
+import { ActivityCard } from './ActivityCard'
 import { WelcomeLetter } from './WelcomeLetter'
 
 export type DoorSelection = {
@@ -83,10 +84,12 @@ export function DoorReveal({ selection, onClose }: { selection: DoorSelection; o
           <h2 id="reveal-title">{day.title}</h2>
           <p id="reveal-message" className="reveal-message">{day.message}</p>
           {day.letter ? <WelcomeLetter letter={day.letter} /> : null}
-          <div className="little-joy">
-            <p className="eyebrow">DAGENS LILLE GLÆDE</p>
-            <p>{day.littleJoy}</p>
-          </div>
+          {day.activity ? <ActivityCard activity={day.activity} description={day.littleJoy} /> : (
+            <div className="little-joy">
+              <p className="eyebrow">DAGENS LILLE GLÆDE</p>
+              <p>{day.littleJoy}</p>
+            </div>
+          )}
           {day.letter ? null : <p className="reveal-signature">Altid med kærlighed <Icon name="heart" /></p>}
           <button type="button" className="back-button" onClick={closeReveal}><Icon name="arrow" /> Tilbage til vores december</button>
         </div>

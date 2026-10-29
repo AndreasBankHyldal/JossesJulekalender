@@ -40,3 +40,40 @@ test('malformed welcome letters produce an explicit login error', async (context
     })
   }
 })
+
+test('login accepts the cozy activity from the authenticated payload', async (context) => {
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'josse', days: adventDays }))
+  const session = await login('test-user', 'test-password')
+  assert.ok(session.days[1].activity)
+  assert.deepEqual(session.days[1].activity, adventDays[1].activity)
+})
+
+test('days without an activity retain the existing session format', async (context) => {
+  const days = adventDays.map((day) => ({ ...day, activity: undefined }))
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'admin', days }))
+  const session = await login('test-user', 'test-password')
+  assert.equal(session.days[1].activity, undefined)
+  assert.deepEqual(session.days[0].letter, adventDays[0].letter)
+})
+
+test('malformed activities produce an explicit login error', async (context) => {
+  let activity: unknown
+  context.mock.method(globalThis, 'fetch', async () => Response.json({
+    role: 'josse',
+    days: adventDays.map((day) => day.day === 2 ? { ...day, activity } : day),
+  }))
+  for (activity of [
+    null,
+    {},
+    { essentials: 'Not an array', timing: 'Whenever we have time' },
+    { essentials: [], timing: 'Whenever we have time' },
+    { essentials: [42], timing: 'Whenever we have time' },
+    { essentials: [' '], timing: 'Whenever we have time' },
+    { essentials: ['Movies'], timing: null },
+    { essentials: ['Movies'], timing: ' ' },
+  ]) {
+    await assert.rejects(login('test-user', 'test-password'), {
+      message: 'Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.',
+    })
+  }
+})

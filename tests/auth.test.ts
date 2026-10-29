@@ -72,6 +72,7 @@ test('login sets a private secure cookie; the session restores without exposing 
   assert.equal(data.role, 'admin')
   assert.equal(data.days.length, 24)
   assert.deepEqual(data.days[0].letter, adventDays[0].letter)
+  assert.deepEqual(data.days[1].activity, adventDays[1].activity)
   assert.equal(JSON.stringify(data).includes(testAuthEnv.ADMIN_PASSWORD), false)
   assert.equal(JSON.stringify(data).includes(testAuthEnv.SESSION_SECRET), false)
   const restored = await handleApi(new Request('https://calendar.test/api', {

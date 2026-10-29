@@ -111,6 +111,49 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
   })
 }
 
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`December 2 directly reveals a rereadable activity with ${reducedMotion} motion`, async ({ page }) => {
+    const day = adventDays[1]
+    if (!day.activity) throw new Error('December 2 must have a cozy activity')
+    await page.emulateMedia({ reducedMotion })
+    await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 2, 12) })
+    await page.goto('/')
+    await signIn(page, 'josse')
+    await page.getByRole('button', { name: '2. december, åbn din overraskelse', exact: true }).click()
+    const dialog = page.getByRole('dialog')
+    const activity = dialog.getByRole('region', { name: 'DAGENS AKTIVITET' })
+    await expect(dialog.getByRole('heading', { name: 'En hyggelig aften' })).toBeVisible()
+    await expect(dialog.locator('#reveal-message')).toHaveText(day.message)
+    await expect(activity).toBeVisible()
+    await expect(activity).toContainText(day.littleJoy)
+    await expect(activity.getByRole('listitem')).toHaveText(day.activity.essentials)
+    await expect(activity).toContainText(day.activity.timing)
+    await expect(dialog.getByRole('button')).toHaveCount(2)
+    await expect(dialog.locator('.little-joy')).toHaveCount(0)
+    const initialContent = await activity.innerText()
+    await page.clock.fastForward(2_000)
+    await expect(dialog.locator('.reveal-letter')).toHaveCSS('opacity', '1')
+    const close = dialog.getByRole('button', { name: 'Luk og vend tilbage til kalenderen' })
+    const back = dialog.getByRole('button', { name: 'Tilbage til vores december' })
+    await expect(close).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(back).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(close).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toHaveCount(0)
+    const openedDoor = page.getByRole('button', { name: '2. december, åbnet, læs igen', exact: true })
+    await expect(openedDoor).toBeFocused()
+    await openedDoor.click()
+    await expect(activity).toHaveText(initialContent, { useInnerText: true })
+    await back.click()
+    await page.reload()
+    await signIn(page, 'josse')
+    await openedDoor.click()
+    await expect(activity).toHaveText(initialContent, { useInnerText: true })
+  })
+}
+
 test('all 24 doors reveal their own content on Christmas Eve with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 24, 12) })
@@ -121,9 +164,9 @@ test('all 24 doors reveal their own content on Christmas Eve with reduced motion
     await page.getByRole('button', { name: `${day}. december, åbn din overraskelse`, exact: true }).click()
     const dialog = page.getByRole('dialog')
     await expect(dialog).toBeVisible()
-    titles.add(await dialog.getByRole('heading').innerText())
+    titles.add(await dialog.getByRole('heading', { level: 2 }).innerText())
     await expect(dialog.locator('#reveal-message')).not.toBeEmpty()
-    await expect(dialog.locator('.little-joy > p:last-child')).not.toBeEmpty()
+    await expect(dialog.locator('.little-joy, .activity-card')).toContainText(adventDays[day - 1].littleJoy)
     await page.keyboard.press('Escape')
   }
   expect(titles.size).toBe(24)
@@ -136,8 +179,13 @@ test('unlocks the next door when the page stays open over midnight', async ({ pa
   await page.goto('/')
   await signIn(page, 'josse')
   await expect(page.locator('.calendar-door[aria-disabled="false"]')).toHaveCount(1)
+  await page.getByRole('button', { name: '2. december, låst indtil den 2. december', exact: true }).click({ force: true })
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.getByText(`Låge 2 åbner den 2. december ${CALENDAR_YEAR}.`)).toBeVisible()
   await page.clock.fastForward(31_000)
   await expect(page.locator('.calendar-door[aria-disabled="false"]')).toHaveCount(2)
+  await page.getByRole('button', { name: '2. december, åbn din overraskelse', exact: true }).click()
+  await expect(page.getByRole('region', { name: 'DAGENS AKTIVITET' })).toBeVisible()
 })
 
 test('the calendar and full-page reveal fit narrow, tablet, and wide screens', async ({ page }) => {
@@ -152,7 +200,7 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
   ]) {
     await page.setViewportSize(viewport)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    for (const day of [1, 24]) {
+    for (const day of [1, 2, 24]) {
       await page.getByRole('button', { name: new RegExp(`^${day}\\. december, `) }).click()
       const dialog = page.getByRole('dialog')
       const box = await dialog.boundingBox()
@@ -167,6 +215,15 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
         const letterBox = await letter.boundingBox()
         expect(letterBox!.x).toBeGreaterThanOrEqual(box!.x)
         expect(letterBox!.x + letterBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
+        expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
+      }
+      if (day === 2) {
+        const activity = dialog.getByRole('region', { name: 'DAGENS AKTIVITET' })
+        await expect(activity).toBeVisible()
+        await activity.scrollIntoViewIfNeeded()
+        const activityBox = await activity.boundingBox()
+        expect(activityBox!.x).toBeGreaterThanOrEqual(box!.x)
+        expect(activityBox!.x + activityBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
         expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
       }
       await dialog.getByRole('button', { name: 'Tilbage til vores december' }).click()
