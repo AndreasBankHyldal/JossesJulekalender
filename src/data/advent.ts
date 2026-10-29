@@ -8,6 +8,11 @@ export type AdventLetter = {
   signature: string
 }
 
+export type AdventActivity = {
+  essentials: string[]
+  timing: string
+}
+
 export type AdventDay = {
   day: number
   theme: Theme
@@ -17,6 +22,7 @@ export type AdventDay = {
   message: string
   littleJoy: string
   letter?: AdventLetter
+  activity?: AdventActivity
 }
 
 export const adventDays: AdventDay[] = [
@@ -39,7 +45,19 @@ export const adventDays: AdventDay[] = [
       signature: 'Altid med kærlighed',
     },
   },
-  { day: 2, theme: 'cream', pattern: 'plain', art: 'sprig', title: 'En stille morgen', message: 'Midt i al juletravlheden kommer her en lille påmindelse: Vi behøver ikke skynde os gennem de dejlige øjeblikke. Især ikke dem, vi får lov til at dele.', littleJoy: 'Noget varmt at drikke, et blødt tæppe og lidt ekstra tid sammen.' },
+  {
+    day: 2,
+    theme: 'cream',
+    pattern: 'plain',
+    art: 'sprig',
+    title: 'En hyggelig aften',
+    message: 'I dag inviterer jeg dig til en aften med julefilm og masser af hygge. Bare dig og mig, pakket ind i dyner, mens december bliver lidt varmere.',
+    littleJoy: 'Vi finder en julefilm, fylder skålene med dine yndlingssnacks og laver varm kakao. Så kravler vi under dynen og nyder en aften sammen.',
+    activity: {
+      essentials: ['Julefilm', 'Dyner og tæpper', 'Dine yndlingssnacks', 'Varm kakao'],
+      timing: 'Har vi ikke tid i dag, gemmer vi hyggen til en aften, der passer os begge.',
+    },
+  },
   { day: 3, theme: 'pine', pattern: 'snow', art: 'star', title: 'Du lyser min verden op', message: 'Nogle mennesker gør en helt almindelig dag særlig bare ved at være en del af den. Sådan er du for mig. Min lille smule jul i hverdagen.', littleJoy: 'Lad os gå en tur og finde de smukkeste julelys.' },
   { day: 4, theme: 'olive', pattern: 'stripes', art: 'ornament', title: 'Perfekt på vores måde', message: 'En perfekt planlagt aften er dejlig. Men en aften uden planer sammen med dig? Det er som regel min favorit. Det bedste er at være sammen.', littleJoy: 'Du vælger aftensmaden i dag. Jeg tager mig af resten.' },
   { day: 5, theme: 'cranberry', pattern: 'plain', art: 'tree', title: 'Lidt plads til glæde', message: 'Lad os hylde de små ting: dit smil, en god sang, varme hænder og at komme hjem til hinanden. Det er dem, der gør livet stort.', littleJoy: 'Lad os sætte julemusik på og lave absolut ingenting nyttigt.' },

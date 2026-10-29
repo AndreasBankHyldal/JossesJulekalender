@@ -153,6 +153,15 @@
 .reveal-cover .door-frame { inset: 20px; }
 .cover-knob { position: absolute; right: 5%; top: 50%; width: 15px; height: 15px; border-radius: 50%; background: #bc9c5e; box-shadow: 1px 3px 4px #0003, inset 1px 1px 3px #f4e7b6; }
 
+.activity-card { width: min(100%, 520px); margin-top: 28px; padding: 24px 30px; border: 1px solid #d9cdb2; border-radius: 5px; background: #f0eadc; box-shadow: 0 7px 22px #61553809; }
+.activity-card > .eyebrow { margin: 0; color: var(--red); font-size: 8px; font-weight: 500; letter-spacing: 1.8px; }
+.activity-illustration { width: min(100%, 290px); margin: 16px auto; aspect-ratio: 320 / 155; }
+.activity-description { font-family: var(--serif); font-size: 25px; line-height: 1.35; text-wrap: pretty; }
+.activity-essentials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 0; margin: 22px 0; list-style: none; text-align: left; }
+.activity-essentials > li { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid #ded2b7; border-radius: 3px; background: #fffaf080; color: #526048; font-size: 11px; line-height: 1.6; overflow-wrap: anywhere; }
+.activity-essentials svg { width: 13px; height: 13px; flex-shrink: 0; color: #a28753; }
+.activity-timing { padding-top: 16px; border-top: 1px solid #d9cdb2; color: #626b5b; font-size: 12px; line-height: 1.8; text-wrap: pretty; }
+
 .welcome-letter { width: min(100%, 560px); margin-top: 24px; }
 .welcome-envelope { position: relative; isolation: isolate; padding-top: 25px; }
 .welcome-envelope-button { display: flex; flex-direction: column; align-items: center; gap: 20px; width: min(100%, 300px); margin: 0 auto; padding: 8px; border: 0; border-radius: 4px; background: transparent; color: var(--red); }
@@ -294,6 +303,10 @@
   .little-joy > p:last-child { font-size: 22px; }
   .reveal-signature { font-size: 23px; margin-top: 22px; }
   .back-button { margin-top: 18px; }
+  .activity-card { padding: 20px 18px; margin-top: 23px; }
+  .activity-description { font-size: 23px; }
+  .activity-essentials { grid-template-columns: 1fr; margin-block: 18px; }
+  .activity-timing { font-size: 11px; }
   .welcome-letter { margin-top: 18px; }
   .welcome-letter-paper { padding: 24px 20px; }
   .welcome-letter-paper > p { font-size: 13px; }

@@ -39,6 +39,7 @@ Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-c
 
 - Rediger de 24 beskeder, overskrifter og aktiviteter i `src/data/advent.ts`. De medfølgende hilsner er eksempler; erstat dem med dine egne minder, planer eller gaver.
 - Låge 1 indeholder et velkomstbrev i en kuvert, som åbnes ved tryk. Tilpas hilsenen, afsnittene og underskriften i dagens `letter`-felt. Brevet kan foldes sammen og læses igen; det sendes kun efter login, ligesom de øvrige hilsner. Ved reduceret bevægelse åbner brevet uden bevægelseseffekterne.
+- Låge 2 viser dagens aktivitet direkte: en hyggelig aften med julefilm, dyner, snacks og varm kakao. Tilpas invitationen og beskrivelsen i dagens `message` og `littleJoy`, listen i `activity.essentials` og den fleksible aftale i `activity.timing`. Der er intet gavekort, ingen indløsning og ingen ekstra gemt aktivitetsstatus.
 - Indstil årstallet i `src/lib/calendar.ts`. Åbnede låger gemmes separat for hvert år.
 - Rediger overskriften, dedikationen og navnet øverst på kalenderen i `src/components/Calendar.tsx`. Loginteksterne findes i `src/components/LoginPage.tsx`.
 - Farver, layout og animationer findes i `src/App.css`. Skrifttyper og juleillustrationer følger med lokalt; siden henter ikke skrifttyper eller billeder fra tredjeparter.

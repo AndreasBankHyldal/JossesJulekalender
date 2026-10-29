@@ -28,6 +28,14 @@ test('December 1 has a complete editable welcome letter', () => {
   assert.ok(letter.signature.trim())
 })
 
+test('December 2 has a complete cozy evening activity with flexible timing', () => {
+  const { activity } = adventDays[1]
+  assert.ok(activity)
+  assert.deepEqual(activity.essentials, ['Julefilm', 'Dyner og tæpper', 'Dine yndlingssnacks', 'Varm kakao'])
+  assert.ok(activity.timing.trim())
+  assert.equal(adventDays.filter((day) => day.activity).length, 1)
+})
+
 test('doors are locked before December of the configured year', () => {
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR - 1, 11, 24)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 9, 27)), 0)
