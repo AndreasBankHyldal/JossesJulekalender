@@ -8,6 +8,8 @@ import { signIn } from './sign-in'
 test('anonymous visitors see only login and cannot fetch private notes', async ({ page, request }) => {
   const activity = adventDays[1].activity
   if (!activity) throw new Error('December 2 must have a cozy activity')
+  const sleighGame = adventDays[2].sleighGame
+  if (!sleighGame) throw new Error('December 3 must have a sleigh game')
   await page.goto('/')
   await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
   await expect(page.locator('.calendar-door')).toHaveCount(0)
@@ -16,6 +18,7 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
   const privateContent = [
     adventDays[0].title, ...(adventDays[0].letter?.paragraphs ?? []),
     adventDays[1].message, adventDays[1].littleJoy, activity.timing,
+    adventDays[2].message, sleighGame.instructions, sleighGame.resultMessage,
   ]
   const anonymousBody = await response.text()
   for (const privateText of privateContent) expect(anonymousBody).not.toContain(privateText)
@@ -86,6 +89,9 @@ test('admin can open all 24 doors before December and progress survives logging 
     await expect(page.getByRole('dialog')).toBeVisible()
     if (day === 2) {
       await expect(page.getByRole('region', { name: 'DAGENS AKTIVITET' })).toContainText(adventDays[1].littleJoy)
+    }
+    if (day === 3) {
+      await expect(page.getByRole('button', { name: 'Start turen' })).toBeVisible()
     }
     await page.keyboard.press('Escape')
   }

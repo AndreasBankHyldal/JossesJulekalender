@@ -4,23 +4,16 @@ import {
   authenticate, AuthConfigurationError, createSession,
   readAuthConfig, sessionCookie, sessionFromCookie,
 } from './auth.ts'
-
-function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
-  return Response.json(body, {
-    status,
-    headers: {
-      'Cache-Control': 'private, no-store',
-      'Vary': 'Cookie',
-      'X-Content-Type-Options': 'nosniff',
-      ...headers,
-    },
-  })
-}
+import { json } from './http.ts'
+import { handleSleighScores } from './sleigh-scores.ts'
+import type { SleighScoreStore } from './sleigh-scores.ts'
 
 export async function handleApi(
   request: Request,
   env: Record<string, string | undefined> = process.env,
+  localScores?: SleighScoreStore,
 ): Promise<Response> {
+  if (new URL(request.url).searchParams.get('resource') === 'sleigh-game') return handleSleighScores(request, env, localScores)
   const secure = new URL(request.url).protocol === 'https:'
   if (request.method !== 'GET') {
     const origin = request.headers.get('origin')

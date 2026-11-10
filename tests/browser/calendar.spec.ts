@@ -24,7 +24,7 @@ test('opens into an almost-full-page reveal, traps focus, dismisses, and remembe
   await door.click()
   const dialog = page.getByRole('dialog')
   await expect(dialog).toBeVisible()
-  await expect(dialog.getByRole('heading', { name: 'Du lyser min verden op' })).toBeVisible()
+  await expect(dialog.getByRole('heading', { name: 'Julemandens kane', level: 2 })).toBeVisible()
   const box = await dialog.boundingBox()
   const viewport = page.viewportSize()!
   expect(box!.width / viewport.width).toBeGreaterThan(.8)
@@ -200,7 +200,7 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
   ]) {
     await page.setViewportSize(viewport)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    for (const day of [1, 2, 24]) {
+    for (const day of [1, 2, 3, 24]) {
       await page.getByRole('button', { name: new RegExp(`^${day}\\. december, `) }).click()
       const dialog = page.getByRole('dialog')
       const box = await dialog.boundingBox()
@@ -225,6 +225,22 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
         expect(activityBox!.x).toBeGreaterThanOrEqual(box!.x)
         expect(activityBox!.x + activityBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
         expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
+      }
+      if (day === 3) {
+        const game = dialog.getByRole('region', { name: 'Julemandens kane' })
+        await expect(game).toBeVisible()
+        const gameBox = await game.boundingBox()
+        expect(gameBox!.x).toBeGreaterThanOrEqual(box!.x)
+        expect(gameBox!.x + gameBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
+        expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
+        await game.getByRole('button', { name: 'Start turen' }).click()
+        const boardBox = await game.getByRole('slider', { name: 'Styr kanen' }).boundingBox()
+        expect(boardBox!.width).toBeGreaterThanOrEqual(180)
+        for (const control of await game.locator('.sleigh-controls button').all()) {
+          const controlBox = await control.boundingBox()
+          expect(controlBox!.width).toBeGreaterThanOrEqual(44)
+          expect(controlBox!.height).toBeGreaterThanOrEqual(44)
+        }
       }
       await dialog.getByRole('button', { name: 'Tilbage til vores december' }).click()
       await expect(dialog).toHaveCount(0)

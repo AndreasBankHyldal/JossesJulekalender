@@ -13,6 +13,11 @@ export type AdventActivity = {
   timing: string
 }
 
+export type AdventSleighGame = {
+  instructions: string
+  resultMessage: string
+}
+
 export type AdventDay = {
   day: number
   theme: Theme
@@ -23,6 +28,7 @@ export type AdventDay = {
   littleJoy: string
   letter?: AdventLetter
   activity?: AdventActivity
+  sleighGame?: AdventSleighGame
 }
 
 export const adventDays: AdventDay[] = [
@@ -58,7 +64,19 @@ export const adventDays: AdventDay[] = [
       timing: 'Har vi ikke tid i dag, gemmer vi hyggen til en aften, der passer os begge.',
     },
   },
-  { day: 3, theme: 'pine', pattern: 'snow', art: 'star', title: 'Du lyser min verden op', message: 'Nogle mennesker gør en helt almindelig dag særlig bare ved at være en del af den. Sådan er du for mig. Min lille smule jul i hverdagen.', littleJoy: 'Lad os gå en tur og finde de smukkeste julelys.' },
+  {
+    day: 3,
+    theme: 'pine',
+    pattern: 'snow',
+    art: 'snowflake',
+    title: 'Julemandens kane',
+    message: 'Saml gaver, undgå forhindringer, og se, hvor langt du kan nå!',
+    littleJoy: 'En lille juletur uden tidsgrænse. Kan du slå min gaverekord eller overleve længere end mig?',
+    sleighGame: {
+      instructions: 'Træk fingeren på banen for at styre kanen til siderne. På computer kan du også bruge piletasterne eller A og D. Saml gaver, og undgå snemænd, biler, træer og sten. Du har to hjerter, og farten stiger hele tiden!',
+      resultMessage: 'Tak for juleturen, Mousis. Der er altid plads til en tur mere, og du er stadig min yndlingsperson at dele december med.',
+    },
+  },
   { day: 4, theme: 'olive', pattern: 'stripes', art: 'ornament', title: 'Perfekt på vores måde', message: 'En perfekt planlagt aften er dejlig. Men en aften uden planer sammen med dig? Det er som regel min favorit. Det bedste er at være sammen.', littleJoy: 'Du vælger aftensmaden i dag. Jeg tager mig af resten.' },
   { day: 5, theme: 'cranberry', pattern: 'plain', art: 'tree', title: 'Lidt plads til glæde', message: 'Lad os hylde de små ting: dit smil, en god sang, varme hænder og at komme hjem til hinanden. Det er dem, der gør livet stort.', littleJoy: 'Lad os sætte julemusik på og lave absolut ingenting nyttigt.' },
   { day: 6, theme: 'cream', pattern: 'stars', art: 'gift', title: 'Den sødeste gave', message: 'Hvis jeg kunne pakke den følelse ind, som du giver mig, ville det være den bedste gave under træet. Tak, fordi du er helt og vidunderligt dig selv.', littleJoy: 'Der skal noget sødt til. Skal vi bage julesmåkager?' },

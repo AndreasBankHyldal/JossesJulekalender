@@ -29,7 +29,7 @@ Der findes kun to konti, som du selv vælger i `.env`:
 
 Brug forskellige brugernavne. Josse får den almindelige kalender med datolåste låger. Dit login får **testadgang til alle 24 låger på alle datoer**, så du kan kontrollere nye ændringer. Kontiene har hver deres gemte låger i browseren, så din afprøvning ikke åbner Josses låger.
 
-Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-cookie i syv dage, og der er en knap til at logge ud. Ændrer du en kontos login eller sessionsnøglen, bliver de berørte sessioner ugyldige. Der er ingen database eller ekstern logintjeneste.
+Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-cookie i syv dage, og der er en knap til at logge ud. Ændrer du en kontos login eller sessionsnøglen, bliver de berørte sessioner ugyldige. Login kræver ingen database eller ekstern logintjeneste. Fælles spilrekorder bruger Upstash Redis.
 
 **Login vises først, hver gang siden åbnes eller genindlæses**, også i en ny fane og selv med en eksisterende sessionscookie. Kalenderen vises og hilsnerne hentes først, når loginformularen er sendt og godkendt. Der er ingen automatisk genindlogning; gemte åbnede låger bevares efter næste login.
 
@@ -40,6 +40,7 @@ Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-c
 - Rediger de 24 beskeder, overskrifter og aktiviteter i `src/data/advent.ts`. De medfølgende hilsner er eksempler; erstat dem med dine egne minder, planer eller gaver.
 - Låge 1 indeholder et velkomstbrev i en kuvert, som åbnes ved tryk. Tilpas hilsenen, afsnittene og underskriften i dagens `letter`-felt. Brevet kan foldes sammen og læses igen; det sendes kun efter login, ligesom de øvrige hilsner. Ved reduceret bevægelse åbner brevet uden bevægelseseffekterne.
 - Låge 2 viser dagens aktivitet direkte: en hyggelig aften med julefilm, dyner, snacks og varm kakao. Tilpas invitationen og beskrivelsen i dagens `message` og `littleJoy`, listen i `activity.essentials` og den fleksible aftale i `activity.timing`. Der er intet gavekort, ingen indløsning og ingen ekstra gemt aktivitetsstatus.
+- Låge 3 indeholder **Julemandens kane**, et Canvas-spil uden tidsgrænse. Træk fingeren på banen, flyt musen, eller brug piletasterne/A og D for at styre til siderne. Saml gaver og undgå snemænd, biler, træer og sten, mens vejen bliver hurtigere. Startfarten er rolig; farten stiger jævnt til det dobbelte efter 20 sekunder og det tredobbelte efter 40 sekunder og fortsætter opad. To hjerter giver plads til ét sammenstød; efter det andet slutter turen. Et kortvarigt skjold forhindrer, at samme sammenstød tager begge liv. Tilpas vejledningen og sluthilsenen i dagens `sleighGame`-felt. Pauseknappen eller en skjult/inaktiv fane stopper både vej og overlevelsestid, indtil man fortsætter. Reduceret bevægelse fjerner ekstra sne/parallakse; vejens og forhindringernes bevægelse er en del af selve spillet og starter kun efter et aktivt valg.
 - Indstil årstallet i `src/lib/calendar.ts`. Åbnede låger gemmes separat for hvert år.
 - Rediger overskriften, dedikationen og navnet øverst på kalenderen i `src/components/Calendar.tsx`. Loginteksterne findes i `src/components/LoginPage.tsx`.
 - Farver, layout og animationer findes i `src/App.css`. Skrifttyper og juleillustrationer følger med lokalt; siden henter ikke skrifttyper eller billeder fra tredjeparter.
@@ -47,6 +48,22 @@ Login kontrolleres på serveren. Sessionen gemmes i en underskrevet `HttpOnly`-c
 Lågerne låses op ved midnat **i tidszonen på den besøgendes enhed**. Tidligere låger forbliver tilgængelige, også efter jul. Siden kontrollerer datoen hvert 30. sekund, når den får fokus, og hver gang der trykkes på en låge. Åbnede låger gemmes i browserens lokale lager og synkroniseres ikke mellem enheder. Fejl ved lagring vises på siden.
 
 Dette er en enkel, personlig kalender med login, ikke en sikker tidslås: En indlogget person kan stadig ændre enhedens ur eller undersøge de hilsner, browseren har hentet. Hilsnerne sendes kun fra `/api` efter login og ligger ikke i den offentlige JavaScript-fil. Læg alligevel ikke adgangskoder, gavekortkoder eller andre hemmeligheder i kalenderen. Et `noindex`-metatag beder desuden søgemaskiner om ikke at indeksere siden.
+
+### Fælles rekorder i låge 3
+
+Hver afsluttet tur gemmer to uafhængige personlige rekorder: flest gaver og længste aktive overlevelsestid (i millisekunder). De behøver ikke komme fra samme tur. Spil på administratorkontoen for at sætte Andreas' rekorder; Josse ser dem sammen med sine egne i låge 3, også på en anden enhed. Lavere resultater erstatter aldrig en rekord. Rekorderne hentes ved åbning, ved fokus på fanen og hvert 15. sekund, mens siden er synlig. Fejl ved hentning eller lagring vises med en knap til at prøve igen.
+
+Forbind Upstash Redis til Vercel-projektet. Serveren bruger `KV_REST_API_URL` og `KV_REST_API_TOKEN` (eller `UPSTASH_REDIS_REST_URL` og `UPSTASH_REDIS_REST_TOKEN`). Brug ikke en read-only-token til lagring, og tilføj aldrig `VITE_` til navnene. Production, Preview og Development får hver deres nøgle under `josses:sleigh-game:<miljø>:<år>`, så test ikke ændrer de rigtige rekorder. Begge værdier opdateres atomisk med Redis `ZADD GT`. Ingen oprydning eller udløbsdato nulstiller rekorderne. Kanespillet bruger en separat nøgle fra det tidligere snefnugspil, hvis der findes gamle testresultater.
+
+Dette er en venskabelig konkurrence, ikke et snydesikkert ranglistesystem: Serveren kontrollerer login, spilleridentitet og at begge værdier er ikke-negative, sikre heltal; selve spillet kører i browseren.
+
+### Lokal spiltest uden database
+
+```sh
+npm run dev:game
+```
+
+Åbn den localhost-adresse, Vite viser (normalt `http://127.0.0.1:5173`, eller næste ledige port). Brug de opdigtede konti `admin-test` / `admin-test-only-password` eller `josse-test` / `josse-test-only-password`. Administratorkontoen har adgang til alle låger; Josse følger stadig datolåsningen. Rekorderne gemmes atomisk i den Git-ignorerede `.local/sleigh-scores.json`, ikke i Redis, og bevares efter genstart. En tydelig tekst i spillet markerer lokal test. Ingen produktionsadgangskoder behøves. Det normale `npm run dev` bruger fortsat dine egne miljøvariabler og Redis; der er ingen automatisk lokal fallback på lagringsfejl.
 
 ## Kontrol
 
@@ -82,12 +99,13 @@ Ved genbrug i et andet repository skal JSON-filen importeres og aktiveres under 
 
 ## Vercel Hobby (gratis)
 
-Login bruger én lille Node.js-funktion i `api/index.ts`, som kan køre på Hobby. Der kræves ingen database, API-nøgler eller betalte integrationer.
+Login og spilrekorder bruger én lille Node.js-funktion i `api/index.ts`, som kan køre på Hobby. Kalenderen og login kræver ingen betalte integrationer; fælles rekorder kræver en tilsluttet Upstash Redis-database.
 
 1. Skub dette lokale Git-repository til et GitHub-repository.
 2. Importer repositoryet i Vercel, og vælg **Vite** som projektindstilling.
 3. Behold `npm run build` som byggekommando og `dist` som outputmappe.
 4. Tilføj alle fem variabler fra `.env.example` under **Settings → Environment Variables** i Vercel. Brug dine egne værdier som hemmelige variabler, uden `VITE_`-præfiks. Den ignorerede lokale `.env` følger ikke automatisk med til Vercel.
 5. Udgiv siden. Udgiv igen, når du ændrer miljøvariablerne i Vercel.
+6. For fælles spilrekorder: Forbind Upstash Redis fra Storage til Production og Preview, og kontrollér, at de to `KV_REST_API_*`-variabler er tilføjet. Tilføj Development til forbindelsen, hvis det normale lokale udviklingsmiljø også skal bruge Redis. Den særskilte `npm run dev:game` bruger kun lokale testrekorder.
 
 Siden bruger rodruten og API-ruten `/api`, så der er ikke brug for en SPA-omskrivningskonfiguration. Kør `npm run build` efterfulgt af `npm run preview` for at se produktionsversionen lokalt; Vite-tilføjelsen bruger samme API-kode som Vercel-funktionen.
