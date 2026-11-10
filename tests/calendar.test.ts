@@ -46,6 +46,20 @@ test('December 5 invites to a hot chocolate date at Peter Beier with a free choi
   assert.equal(adventDays.filter((advent) => advent.dateInvitation).length, 1)
 })
 
+test('December 7 has the three supplied hints and a Danish snacks-and-face-masks gift reveal', () => {
+  const day = adventDays[6]
+  assert.ok(day.giftSurprise)
+  assert.deepEqual(day.giftSurprise.hints, [
+    'Hop i hjertetøjet og ind under dynen',
+    'Den ene halvdel er til ganen den anden halvdel er en lille selvforkælelse',
+    'Tænk på lækre snacks, et fedtet ansigt og sengen som er vores mini spa',
+  ])
+  assert.equal(day.giftSurprise.revealTitle, 'Snacks og ansigtsmasker')
+  assert.match(day.giftSurprise.revealMessage, /Åbn din gave/)
+  assert.match(day.littleJoy, /intet, du skal nå i dag/)
+  assert.equal(adventDays.filter((advent) => advent.giftSurprise).length, 1)
+})
+
 test('doors are locked before December of the configured year', () => {
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR - 1, 11, 24)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 9, 27)), 0)

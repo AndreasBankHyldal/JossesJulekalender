@@ -137,3 +137,39 @@ test('malformed date invitations produce an explicit login error', async (contex
     })
   }
 })
+
+test('login accepts the gift surprise while days without it remain compatible', async (context) => {
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'josse', days: adventDays }))
+  const session = await login('test-user', 'test-password')
+  assert.ok(session.days[6].giftSurprise)
+  assert.deepEqual(session.days[6].giftSurprise, adventDays[6].giftSurprise)
+  assert.equal(session.days[0].giftSurprise, undefined)
+})
+
+test('malformed gift surprises produce an explicit login error', async (context) => {
+  let giftSurprise: unknown
+  const valid = adventDays[6].giftSurprise
+  assert.ok(valid)
+  context.mock.method(globalThis, 'fetch', async () => Response.json({
+    role: 'josse',
+    days: adventDays.map((day) => day.day === 7 ? { ...day, giftSurprise } : day),
+  }))
+  for (giftSurprise of [
+    null,
+    {},
+    { ...valid, hints: 'Not an array' },
+    { ...valid, hints: [] },
+    { ...valid, hints: ['First', 'Second'] },
+    { ...valid, hints: ['First', 'Second', 'Third', 'Fourth'] },
+    { ...valid, hints: ['First', 2, 'Third'] },
+    { ...valid, hints: ['First', ' ', 'Third'] },
+    { ...valid, revealTitle: null },
+    { ...valid, revealTitle: ' ' },
+    { ...valid, revealMessage: 7 },
+    { ...valid, revealMessage: ' ' },
+  ]) {
+    await assert.rejects(login('test-user', 'test-password'), {
+      message: 'Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.',
+    })
+  }
+})

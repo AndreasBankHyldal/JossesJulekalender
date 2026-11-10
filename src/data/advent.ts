@@ -24,6 +24,12 @@ export type AdventDateInvitation = {
   timing: string
 }
 
+export type AdventGiftSurprise = {
+  hints: [string, string, string]
+  revealTitle: string
+  revealMessage: string
+}
+
 export type AdventDay = {
   day: number
   theme: Theme
@@ -36,6 +42,7 @@ export type AdventDay = {
   activity?: AdventActivity
   sleighGame?: AdventSleighGame
   dateInvitation?: AdventDateInvitation
+  giftSurprise?: AdventGiftSurprise
 }
 
 export const adventDays: AdventDay[] = [
@@ -100,7 +107,24 @@ export const adventDays: AdventDay[] = [
     },
   },
   { day: 6, theme: 'cream', pattern: 'stars', art: 'gift', title: 'Den sødeste gave', message: 'Hvis jeg kunne pakke den følelse ind, som du giver mig, ville det være den bedste gave under træet. Tak, fordi du er helt og vidunderligt dig selv.', littleJoy: 'Der skal noget sødt til. Skal vi bage julesmåkager?' },
-  { day: 7, theme: 'olive', pattern: 'snow', art: 'snowflake', title: 'Helt din egen', message: 'Ligesom et snefnug findes der ingen helt som dig. Og blandt alle mennesker i verden er jeg så glad for, at netop vi fandt hinanden.', littleJoy: 'Fortæl mig én lille ting, du godt kunne tænke dig, at vi laver sammen denne vinter.' },
+  {
+    day: 7,
+    theme: 'olive',
+    pattern: 'snow',
+    art: 'gift',
+    title: 'Tre små hints til dig',
+    message: 'Jeg har gemt en lille gave til dig, Mousis. Vil du gætte, hvad der er i? Åbn ét hint ad gangen, og lad dig overraske.',
+    littleJoy: 'Der er intet, du skal nå i dag. Gem hyggen til en aften, hvor du har lyst til lidt ekstra forkælelse.',
+    giftSurprise: {
+      hints: [
+        'Hop i hjertetøjet og ind under dynen',
+        'Den ene halvdel er til ganen den anden halvdel er en lille selvforkælelse',
+        'Tænk på lækre snacks, et fedtet ansigt og sengen som er vores mini spa',
+      ],
+      revealTitle: 'Snacks og ansigtsmasker',
+      revealMessage: 'Overraskelse! Snacks og ansigtsmasker til en hyggelig lille spa-aften. Åbn din gave, find dig godt til rette, og nyd lidt velfortjent forkælelse.',
+    },
+  },
   { day: 8, theme: 'pine', pattern: 'plain', art: 'bow', title: 'En dag til hygge', message: 'Verden må beholde sine travle planer i dag. Jeg vil hellere være et varmt sted sammen med dig og gøre en helt almindelig aften til et lille minde.', littleJoy: 'Filmaften i en tæppehule. Ekstra tæpper og ekstra lækkerier.' },
   { day: 9, theme: 'cream', pattern: 'stripes', art: 'heart', title: 'Bare en lille påmindelse', message: 'På de gode dage og på de knap så gode dage er du elsket. Ikke på grund af det, du gør, eller hvor meget du når. Bare fordi du er dig.', littleJoy: 'Et rigtig langt kram. Helt uden nogen særlig grund.' },
   { day: 10, theme: 'cranberry', pattern: 'snow', art: 'star', title: 'Et ønske for dig', message: 'Jeg håber, at denne december giver dig den samme varme og glæde, som du bringer ind i mit liv. Og en lille smule magi, du ikke havde set komme.', littleJoy: 'Lad os hver skrive et ønske ned for det kommende år.' },
