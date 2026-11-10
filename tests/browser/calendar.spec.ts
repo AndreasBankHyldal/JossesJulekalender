@@ -154,6 +154,85 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
   })
 }
 
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`December 5 reveals a Peter Beier hot chocolate invitation by button or scratching with ${reducedMotion} motion`, async ({ page }) => {
+    const day = adventDays[4]
+    const invitation = day.dateInvitation
+    if (!invitation) throw new Error('December 5 must have a date invitation')
+    await page.emulateMedia({ reducedMotion })
+    await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 5, 12) })
+    await page.goto('/')
+    await signIn(page, 'josse')
+    await page.getByRole('button', { name: '5. december, åbn din overraskelse', exact: true }).click()
+    const dialog = page.getByRole('dialog')
+    const card = dialog.getByRole('region', { name: 'DIN INVITATION' })
+    const cover = card.locator('canvas.scratch-card-cover')
+    const revealButton = card.getByRole('button', { name: 'Vis hele invitationen' })
+    await expect(dialog.getByRole('heading', { name: day.title, level: 2 })).toBeVisible()
+    await expect(dialog.locator('#reveal-message')).toHaveText(day.message)
+    await expect(dialog.locator('.little-joy')).toHaveCount(0)
+    await page.clock.fastForward(2_000)
+    await expect(dialog.locator('.reveal-letter')).toHaveCSS('opacity', '1')
+
+    // The essential invitation is available to assistive technology before scratching.
+    await expect(cover).toHaveAttribute('aria-hidden', 'true')
+    await expect(card.getByText(invitation.venue, { exact: true })).toBeVisible()
+    await expect(card).toContainText(day.littleJoy)
+    await expect(card).toContainText(invitation.choice)
+    await expect(card).toContainText(invitation.timing)
+    expect(await cover.evaluate((canvas: HTMLCanvasElement) => {
+      const context = canvas.getContext('2d')!
+      return context.getImageData(canvas.width / 2, canvas.height / 2, 1, 1).data[3]
+    })).toBe(255)
+
+    const close = dialog.getByRole('button', { name: 'Luk og vend tilbage til kalenderen' })
+    const back = dialog.getByRole('button', { name: 'Tilbage til vores december' })
+    await expect(close).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(revealButton).toBeFocused()
+    await page.keyboard.press('Enter')
+    await expect(revealButton).toHaveCount(0)
+    await expect(card.locator('.scratch-card-content')).toBeFocused()
+    if (reducedMotion === 'reduce') {
+      await expect(cover).toHaveCount(0)
+    } else {
+      await expect(cover).toHaveClass(/is-clearing/)
+      await page.clock.fastForward(1_000)
+      await expect(cover).toHaveCount(0)
+    }
+    await expect(card).toContainText('Invitationen er skrabet fri')
+    await page.keyboard.press('Tab')
+    await expect(back).toBeFocused()
+    await page.keyboard.press('Tab')
+    await expect(close).toBeFocused()
+    await page.keyboard.press('Escape')
+    await expect(dialog).toHaveCount(0)
+
+    const openedDoor = page.getByRole('button', { name: '5. december, åbnet, læs igen', exact: true })
+    await expect(openedDoor).toBeFocused()
+    await page.reload()
+    await signIn(page, 'josse')
+    await openedDoor.click()
+    await page.clock.fastForward(2_000)
+    await expect(cover).toBeVisible()
+    await cover.scrollIntoViewIfNeeded()
+    const box = (await cover.boundingBox())!
+    for (let y = box.y + 6; y < box.y + box.height; y += 24) {
+      await page.mouse.move(box.x + 4, y)
+      await page.mouse.down()
+      await page.mouse.move(box.x + box.width - 4, y, { steps: 12 })
+      await page.mouse.up()
+      if (await cover.count() === 0 || await cover.evaluate((canvas) => canvas.classList.contains('is-clearing'))) break
+    }
+    await page.clock.fastForward(1_000)
+    await expect(cover).toHaveCount(0)
+    await expect(revealButton).toHaveCount(0)
+    await expect(card.getByText(invitation.venue, { exact: true })).toBeVisible()
+    await back.click()
+    await expect(dialog).toHaveCount(0)
+  })
+}
+
 test('all 24 doors reveal their own content on Christmas Eve with reduced motion', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.clock.install({ time: new Date(CALENDAR_YEAR, 11, 24, 12) })
@@ -166,7 +245,7 @@ test('all 24 doors reveal their own content on Christmas Eve with reduced motion
     await expect(dialog).toBeVisible()
     titles.add(await dialog.getByRole('heading', { level: 2 }).innerText())
     await expect(dialog.locator('#reveal-message')).not.toBeEmpty()
-    await expect(dialog.locator('.little-joy, .activity-card')).toContainText(adventDays[day - 1].littleJoy)
+    await expect(dialog.locator('.little-joy, .activity-card, .date-invitation')).toContainText(adventDays[day - 1].littleJoy)
     await page.keyboard.press('Escape')
   }
   expect(titles.size).toBe(24)
@@ -200,7 +279,7 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
   ]) {
     await page.setViewportSize(viewport)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
-    for (const day of [1, 2, 3, 24]) {
+    for (const day of [1, 2, 3, 5, 24]) {
       await page.getByRole('button', { name: new RegExp(`^${day}\\. december, `) }).click()
       const dialog = page.getByRole('dialog')
       const box = await dialog.boundingBox()
@@ -224,6 +303,18 @@ test('the calendar and full-page reveal fit narrow, tablet, and wide screens', a
         const activityBox = await activity.boundingBox()
         expect(activityBox!.x).toBeGreaterThanOrEqual(box!.x)
         expect(activityBox!.x + activityBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
+        expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
+      }
+      if (day === 5) {
+        const invitation = dialog.getByRole('region', { name: 'DIN INVITATION' })
+        await expect(invitation).toBeVisible()
+        await invitation.scrollIntoViewIfNeeded()
+        const invitationBox = await invitation.boundingBox()
+        expect(invitationBox!.x).toBeGreaterThanOrEqual(box!.x)
+        expect(invitationBox!.x + invitationBox!.width).toBeLessThanOrEqual(box!.x + box!.width)
+        const coverBox = await invitation.locator('canvas.scratch-card-cover').boundingBox()
+        const contentBox = await invitation.locator('.scratch-card-content').boundingBox()
+        expect(coverBox).toEqual(contentBox)
         expect(await dialog.locator('.reveal-letter').evaluate((content) => content.scrollWidth <= content.clientWidth)).toBe(true)
       }
       if (day === 3) {

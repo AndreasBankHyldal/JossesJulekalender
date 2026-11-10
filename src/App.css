@@ -162,6 +162,24 @@
 .activity-essentials svg { width: 13px; height: 13px; flex-shrink: 0; color: #a28753; }
 .activity-timing { padding-top: 16px; border-top: 1px solid #d9cdb2; color: #626b5b; font-size: 12px; line-height: 1.8; text-wrap: pretty; }
 
+.date-invitation { width: min(100%, 480px); margin-top: 28px; }
+.date-invitation > .eyebrow { margin: 0; color: var(--red); font-size: 8px; font-weight: 500; letter-spacing: 1.8px; }
+.date-invitation-hint { margin-top: 8px; color: #6e7466; font-size: 11px; line-height: 1.8; text-wrap: pretty; }
+.scratch-card { position: relative; margin-top: 14px; border-radius: 8px; box-shadow: 0 10px 26px #61553818; }
+.scratch-card-content { padding: 24px 30px 22px; border: 1px solid #d9b9a6; border-radius: 8px; background: #fffaf0; outline: none; }
+.scratch-card-content:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.date-invitation-cup { width: 86px; height: 64px; margin: 0 auto 6px; }
+.date-invitation-venue { font-family: var(--serif); font-size: 36px; font-weight: 500; line-height: 1.1; color: var(--red); }
+.date-invitation-text { margin-top: 10px; font-family: var(--serif); font-size: 22px; line-height: 1.35; text-wrap: pretty; }
+.date-invitation-choice { display: flex; align-items: flex-start; gap: 10px; margin-top: 18px; padding: 12px 14px; border: 1px solid #e3cfc1; border-radius: 5px; background: #f8ece4; color: #6b3a32; font-size: 12px; line-height: 1.75; text-align: left; text-wrap: pretty; }
+.date-invitation-choice svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 4px; color: var(--red); }
+.date-invitation-timing { margin-top: 16px; padding-top: 14px; border-top: 1px solid #e3d6c4; color: #626b5b; font-size: 12px; line-height: 1.8; text-wrap: pretty; }
+.scratch-card-cover { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; border-radius: 8px; cursor: grab; touch-action: none; transition: opacity 450ms ease; }
+.scratch-card-cover:active { cursor: grabbing; }
+.scratch-card-cover.is-clearing { opacity: 0; pointer-events: none; }
+.scratch-card-reveal { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-top: 12px; padding: 8px 4px; border: 0; border-bottom: 1px solid #c9b4a4; background: transparent; color: var(--red); font-size: 11px; }
+.scratch-card-reveal svg { width: 13px; height: 13px; }
+
 .reveal-letter--game { justify-content: flex-start; padding-top: 48px; }
 .reveal-letter--game > .reveal-art { display: none; }
 .reveal-letter--game > .eyebrow { margin-bottom: 7px; }
@@ -361,6 +379,11 @@
   .activity-description { font-size: 23px; }
   .activity-essentials { grid-template-columns: 1fr; margin-block: 18px; }
   .activity-timing { font-size: 11px; }
+  .date-invitation { margin-top: 23px; }
+  .scratch-card-content { padding: 20px 18px; }
+  .date-invitation-venue { font-size: 32px; }
+  .date-invitation-text { font-size: 20px; }
+  .date-invitation-choice, .date-invitation-timing { font-size: 11px; }
   .reveal-letter--game { padding: 58px 18px 26px; }
   .reveal-letter--game h2 { font-size: 37px; margin-top: 0; }
   .reveal-letter--game > .reveal-message { font-size: 11px; margin-top: 8px; }

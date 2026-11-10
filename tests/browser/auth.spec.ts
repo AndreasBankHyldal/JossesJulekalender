@@ -10,6 +10,8 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
   if (!activity) throw new Error('December 2 must have a cozy activity')
   const sleighGame = adventDays[2].sleighGame
   if (!sleighGame) throw new Error('December 3 must have a sleigh game')
+  const dateInvitation = adventDays[4].dateInvitation
+  if (!dateInvitation) throw new Error('December 5 must have a date invitation')
   await page.goto('/')
   await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
   await expect(page.locator('.calendar-door')).toHaveCount(0)
@@ -19,6 +21,7 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
     adventDays[0].title, ...(adventDays[0].letter?.paragraphs ?? []),
     adventDays[1].message, adventDays[1].littleJoy, activity.timing,
     adventDays[2].message, sleighGame.instructions, sleighGame.resultMessage,
+    adventDays[4].message, adventDays[4].littleJoy, dateInvitation.choice, dateInvitation.timing,
   ]
   const anonymousBody = await response.text()
   for (const privateText of privateContent) expect(anonymousBody).not.toContain(privateText)
@@ -92,6 +95,9 @@ test('admin can open all 24 doors before December and progress survives logging 
     }
     if (day === 3) {
       await expect(page.getByRole('button', { name: 'Start turen' })).toBeVisible()
+    }
+    if (day === 5) {
+      await expect(page.getByRole('region', { name: 'DIN INVITATION' })).toContainText(adventDays[4].littleJoy)
     }
     await page.keyboard.press('Escape')
   }
