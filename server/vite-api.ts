@@ -1,12 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 import { handleApi } from './api.ts'
+import { createLocalScoreStore } from './local-scores.ts'
+import type { SleighScoreStore } from './sleigh-scores.ts'
 
 async function middleware(
   request: IncomingMessage,
   response: ServerResponse,
   next: () => void,
   env: Record<string, string>,
+  localScores?: SleighScoreStore,
 ) {
   const url = new URL(request.url ?? '/', `http://${request.headers.host ?? 'localhost'}`)
   if (url.pathname !== '/api' && url.pathname !== '/api/') return next()
@@ -31,7 +34,7 @@ async function middleware(
       }
       init.body = body
     }
-    const result = await handleApi(new Request(url, init), env)
+    const result = await handleApi(new Request(url, init), env, localScores)
     response.statusCode = result.status
     result.headers.forEach((value, key) => response.setHeader(key, value))
     response.end(await result.text())
@@ -43,8 +46,10 @@ async function middleware(
 }
 
 export function calendarApi(env: Record<string, string>): Plugin {
+  if (env.VERCEL && env.CALENDAR_LOCAL_SCORE_FILE) throw new Error('Lokale testrekorder må ikke bruges på Vercel.')
+  const localScores = env.CALENDAR_LOCAL_SCORE_FILE ? createLocalScoreStore(env.CALENDAR_LOCAL_SCORE_FILE) : undefined
   const handler = (request: IncomingMessage, response: ServerResponse, next: () => void) =>
-    middleware(request, response, next, env)
+    middleware(request, response, next, env, localScores)
   return {
     name: 'calendar-api',
     configureServer(server) { server.middlewares.use(handler) },

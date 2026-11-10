@@ -77,3 +77,33 @@ test('malformed activities produce an explicit login error', async (context) => 
     })
   }
 })
+
+test('login accepts the sleigh game while days without it remain compatible', async (context) => {
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'josse', days: adventDays }))
+  const session = await login('test-user', 'test-password')
+  assert.ok(session.days[2].sleighGame)
+  assert.deepEqual(session.days[2].sleighGame, adventDays[2].sleighGame)
+  assert.equal(session.days[0].sleighGame, undefined)
+  assert.deepEqual(session.days[0].letter, adventDays[0].letter)
+  assert.deepEqual(session.days[1].activity, adventDays[1].activity)
+})
+
+test('malformed sleigh game content produces an explicit login error', async (context) => {
+  let sleighGame: unknown
+  context.mock.method(globalThis, 'fetch', async () => Response.json({
+    role: 'josse',
+    days: adventDays.map((day) => day.day === 3 ? { ...day, sleighGame } : day),
+  }))
+  for (sleighGame of [
+    null,
+    {},
+    { instructions: 30, resultMessage: 'A personal note' },
+    { instructions: ' ', resultMessage: 'A personal note' },
+    { instructions: 'Steer the sleigh', resultMessage: null },
+    { instructions: 'Steer the sleigh', resultMessage: ' ' },
+  ]) {
+    await assert.rejects(login('test-user', 'test-password'), {
+      message: 'Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.',
+    })
+  }
+})

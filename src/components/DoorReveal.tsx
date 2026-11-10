@@ -1,16 +1,18 @@
 import { useEffect, useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 import type { AdventDay } from '../data/advent'
+import type { AccountRole } from '../types/session'
 import { ChristmasArt, Icon } from './ChristmasArt'
 import { ActivityCard } from './ActivityCard'
 import { WelcomeLetter } from './WelcomeLetter'
+import { SleighGame } from './SleighGame'
 
 export type DoorSelection = {
   day: AdventDay
   origin: { top: number; left: number; width: number; height: number }
 }
 
-export function DoorReveal({ selection, onClose }: { selection: DoorSelection; onClose: () => void }) {
+export function DoorReveal({ selection, role, onClose }: { selection: DoorSelection; role: AccountRole; onClose: () => void }) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const { day, origin } = selection
@@ -78,12 +80,13 @@ export function DoorReveal({ selection, onClose }: { selection: DoorSelection; o
         <button type="button" className="reveal-close" aria-label="Luk og vend tilbage til kalenderen" onClick={closeReveal} autoFocus>
           <Icon name="close" />
         </button>
-        <div className="reveal-letter">
+        <div className={`reveal-letter${day.sleighGame ? ' reveal-letter--game' : ''}`}>
           <p className="eyebrow">{day.day}. DECEMBER <span aria-hidden="true">✦</span> EN LILLE TING TIL DIG</p>
           <div className="reveal-art"><ChristmasArt kind={day.art} /></div>
           <h2 id="reveal-title">{day.title}</h2>
           <p id="reveal-message" className="reveal-message">{day.message}</p>
           {day.letter ? <WelcomeLetter letter={day.letter} /> : null}
+          {day.sleighGame ? <SleighGame game={day.sleighGame} role={role} /> : null}
           {day.activity ? <ActivityCard activity={day.activity} description={day.littleJoy} /> : (
             <div className="little-joy">
               <p className="eyebrow">DAGENS LILLE GLÆDE</p>

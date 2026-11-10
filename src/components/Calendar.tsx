@@ -224,7 +224,7 @@ export function Calendar({ session, onLogout, loggingOut, logoutError }: {
         <span>LAVET MED KÆRLIGHED <Icon name="heart" /> JUL {CALENDAR_YEAR}</span>
       </footer>
 
-      {selection ? <DoorReveal selection={selection} onClose={() => setSelection(null)} /> : null}
+      {selection ? <DoorReveal selection={selection} role={role} onClose={() => setSelection(null)} /> : null}
     </div>
   )
 }

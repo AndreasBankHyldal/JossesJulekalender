@@ -1,4 +1,4 @@
-import type { AdventActivity, AdventDay, AdventLetter } from '../data/advent'
+import type { AdventActivity, AdventDay, AdventLetter, AdventSleighGame } from '../data/advent'
 import type { CalendarSession } from '../types/session'
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -20,6 +20,12 @@ function isActivity(value: unknown): value is AdventActivity {
     typeof value.timing === 'string' && value.timing.trim().length > 0
 }
 
+function isSleighGame(value: unknown): value is AdventSleighGame {
+  return isRecord(value) &&
+    typeof value.instructions === 'string' && value.instructions.trim().length > 0 &&
+    typeof value.resultMessage === 'string' && value.resultMessage.trim().length > 0
+}
+
 function isDay(value: unknown): value is AdventDay {
   return isRecord(value) &&
     typeof value.day === 'number' && Number.isInteger(value.day) && value.day >= 1 && value.day <= 24 &&
@@ -28,7 +34,8 @@ function isDay(value: unknown): value is AdventDay {
     typeof value.pattern === 'string' && ['stars', 'stripes', 'snow', 'plain'].includes(value.pattern) &&
     typeof value.art === 'string' && ['bow', 'star', 'tree', 'heart', 'ornament', 'snowflake', 'gift', 'sprig'].includes(value.art) &&
     (value.letter === undefined || isLetter(value.letter)) &&
-    (value.activity === undefined || isActivity(value.activity))
+    (value.activity === undefined || isActivity(value.activity)) &&
+    (value.sleighGame === undefined || isSleighGame(value.sleighGame))
 }
 
 function parseSession(value: unknown): CalendarSession {

@@ -162,6 +162,60 @@
 .activity-essentials svg { width: 13px; height: 13px; flex-shrink: 0; color: #a28753; }
 .activity-timing { padding-top: 16px; border-top: 1px solid #d9cdb2; color: #626b5b; font-size: 12px; line-height: 1.8; text-wrap: pretty; }
 
+.reveal-letter--game { justify-content: flex-start; padding-top: 48px; }
+.reveal-letter--game > .reveal-art { display: none; }
+.reveal-letter--game > .eyebrow { margin-bottom: 7px; }
+.reveal-letter--game h2 { font-size: 43px; margin-top: 0; }
+.reveal-letter--game > .reveal-message { font-size: 12px; line-height: 1.7; margin-top: 9px; }
+.sleigh-game { width: min(100%, 700px); margin-top: 22px; }
+.sleigh-layout { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); align-items: start; gap: 24px; text-align: left; }
+.sleigh-play-area { min-width: 0; }
+.sleigh-hud { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.sleigh-hud p { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; min-height: 56px; padding: 8px 4px; border: 1px solid #ddd3bd; border-radius: 6px; background: #fffaf0; text-align: center; }
+.sleigh-hud p > span:first-child { font-size: 9px; letter-spacing: 1px; color: #717563; text-transform: uppercase; }
+.sleigh-hud strong { font-size: 19px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.sleigh-hearts > span:last-child { display: flex; gap: 5px; }
+.sleigh-hearts > span:last-child > span { width: 21px; height: 21px; color: #c9c7bc; }
+.sleigh-hearts .is-full svg { color: #bb4858; fill: #bb4858; }
+.sleigh-board { position: relative; width: 100%; aspect-ratio: 9 / 13; overflow: hidden; border: 1px solid #2a4856; border-radius: 12px; background: #244959; box-shadow: 0 12px 26px #173a3e1a; }
+.sleigh-board canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.sleigh-board canvas:focus-visible { outline: 3px solid #e8b44e; outline-offset: -4px; }
+.sleigh-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 28px; background: #102837bc; color: #fff8e9; text-align: center; }
+.sleigh-overlay .eyebrow { font-size: 8px; color: #f0ce88; }
+.sleigh-overlay h3 { font-family: var(--serif); font-size: 42px; font-weight: 500; line-height: 1; text-wrap: balance; margin: 0; }
+.sleigh-overlay > p:not(.eyebrow) { font-size: 13px; line-height: 1.8; text-wrap: pretty; }
+.sleigh-start { min-height: 46px; padding: 12px 25px; border: 1px solid #e6c27a; border-radius: 6px; background: #f3d9a0; color: #263f3b; font-size: 13px; font-weight: 500; }
+.sleigh-start:hover { background: #ffe8b8; }
+.sleigh-start:disabled { opacity: .6; cursor: not-allowed; }
+.sleigh-controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; font-size: 11px; color: #68705f; }
+.sleigh-controls button { display: grid; place-items: center; min-width: 44px; min-height: 44px; border: 1px solid #d5c9ad; border-radius: 6px; background: #fffaf0; color: var(--pine); touch-action: manipulation; }
+.sleigh-controls button:disabled { opacity: .45; cursor: default; }
+.sleigh-controls svg { width: 20px; height: 20px; }
+.sleigh-controls button[aria-label='Styr til højre'] svg { transform: rotate(180deg); }
+.sleigh-controls .sleigh-pause { padding: 0 10px; font-size: 11px; }
+.sleigh-aside { padding-top: 5px; }
+.sleigh-instructions, .sleigh-tip, .sleigh-result { font-size: 12px; line-height: 1.85; color: #626b5b; }
+.sleigh-tip { padding: 12px 14px; background: #eee8d8; border-radius: 5px; margin-top: 15px; font-size: 11px; }
+.sleigh-records { margin-top: 20px; }
+.sleigh-records h4 { font-family: var(--serif); font-size: 29px; font-weight: 500; margin: 0 0 6px; color: var(--red); }
+.sleigh-records > p, .sleigh-save, .sleigh-player-record > p { font-size: 11px; line-height: 1.85; color: #6b715f; }
+.sleigh-records > p:last-child { margin-top: 12px; }
+.sleigh-player-record { margin-top: 12px; padding: 14px; border: 1px solid #ddd3bd; border-radius: 6px; background: #fffaf0; }
+.sleigh-player-record h5 { margin: 0 0 12px; font-size: 12px; font-weight: 500; }
+.sleigh-player-record dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.sleigh-player-record dt { font-size: 9px; color: #767968; }
+.sleigh-player-record dd { margin: 5px 0 0; font-size: 17px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.sleigh-save, .sleigh-result { margin-top: 15px; }
+.sleigh-error, .sleigh-save[role='alert'], .sleigh-records [role='alert'] { font-size: 11px; line-height: 1.8; color: var(--red); }
+.sleigh-save button, .sleigh-records button { border: 0; border-bottom: 1px solid currentColor; background: transparent; color: var(--red); padding: 6px 0; font-size: inherit; }
+
+@media (max-width: 620px) {
+  .sleigh-layout { grid-template-columns: minmax(0, 1fr); gap: 22px; max-width: 360px; margin: auto; }
+  .sleigh-aside { padding-top: 0; }
+  .sleigh-overlay { padding: 22px; }
+  .sleigh-overlay h3 { font-size: 37px; }
+}
+
 .welcome-letter { width: min(100%, 560px); margin-top: 24px; }
 .welcome-envelope { position: relative; isolation: isolate; padding-top: 25px; }
 .welcome-envelope-button { display: flex; flex-direction: column; align-items: center; gap: 20px; width: min(100%, 300px); margin: 0 auto; padding: 8px; border: 0; border-radius: 4px; background: transparent; color: var(--red); }
@@ -307,6 +361,10 @@
   .activity-description { font-size: 23px; }
   .activity-essentials { grid-template-columns: 1fr; margin-block: 18px; }
   .activity-timing { font-size: 11px; }
+  .reveal-letter--game { padding: 58px 18px 26px; }
+  .reveal-letter--game h2 { font-size: 37px; margin-top: 0; }
+  .reveal-letter--game > .reveal-message { font-size: 11px; margin-top: 8px; }
+  .sleigh-game { margin-top: 16px; }
   .welcome-letter { margin-top: 18px; }
   .welcome-letter-paper { padding: 24px 20px; }
   .welcome-letter-paper > p { font-size: 13px; }
