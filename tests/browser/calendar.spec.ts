@@ -245,7 +245,12 @@ test('all 24 doors reveal their own content on Christmas Eve with reduced motion
     await expect(dialog).toBeVisible()
     titles.add(await dialog.getByRole('heading', { level: 2 }).innerText())
     await expect(dialog.locator('#reveal-message')).not.toBeEmpty()
-    await expect(dialog.locator('.little-joy, .activity-card, .date-invitation')).toContainText(adventDays[day - 1].littleJoy)
+    if (adventDays[day - 1].giftSurprise) {
+      for (let hint = 0; hint < 3; hint++) {
+        await dialog.getByRole('button', { name: hint === 0 ? 'Åbn første hint' : 'Åbn næste hint' }).click()
+      }
+    }
+    await expect(dialog.locator('.little-joy, .activity-card, .date-invitation, .gift-surprise')).toContainText(adventDays[day - 1].littleJoy)
     await page.keyboard.press('Escape')
   }
   expect(titles.size).toBe(24)

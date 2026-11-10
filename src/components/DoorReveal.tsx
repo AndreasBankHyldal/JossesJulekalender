@@ -5,6 +5,7 @@ import type { AccountRole } from '../types/session'
 import { ChristmasArt, Icon } from './ChristmasArt'
 import { ActivityCard } from './ActivityCard'
 import { DateInvitation } from './DateInvitation'
+import { GiftSurprise } from './GiftSurprise'
 import { WelcomeLetter } from './WelcomeLetter'
 import { SleighGame } from './SleighGame'
 
@@ -90,7 +91,8 @@ export function DoorReveal({ selection, role, onClose }: { selection: DoorSelect
           {day.sleighGame ? <SleighGame game={day.sleighGame} role={role} /> : null}
           {day.activity ? <ActivityCard activity={day.activity} description={day.littleJoy} /> : null}
           {day.dateInvitation ? <DateInvitation invitation={day.dateInvitation} description={day.littleJoy} /> : null}
-          {day.activity || day.dateInvitation ? null : (
+          {day.giftSurprise ? <GiftSurprise surprise={day.giftSurprise} description={day.littleJoy} /> : null}
+          {day.activity || day.dateInvitation || day.giftSurprise ? null : (
             <div className="little-joy">
               <p className="eyebrow">DAGENS LILLE GLÆDE</p>
               <p>{day.littleJoy}</p>

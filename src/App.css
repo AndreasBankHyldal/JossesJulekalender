@@ -180,6 +180,24 @@
 .scratch-card-reveal { display: inline-flex; align-items: center; gap: 7px; min-height: 44px; margin-top: 12px; padding: 8px 4px; border: 0; border-bottom: 1px solid #c9b4a4; background: transparent; color: var(--red); font-size: 11px; }
 .scratch-card-reveal svg { width: 13px; height: 13px; }
 
+.gift-surprise { width: min(100%, 500px); margin-top: 28px; padding: 24px 28px; border: 1px solid #d9cdb2; border-radius: 5px; background: #f0eadc; }
+.gift-surprise > .eyebrow { margin: 0; color: var(--red); font-size: 8px; letter-spacing: 1.8px; }
+.gift-surprise-progress { margin-top: 8px; color: #626b5b; font-size: 11px; }
+.gift-surprise-hints { display: grid; gap: 12px; padding: 0; margin: 18px 0 0; list-style: none; text-align: left; }
+.gift-surprise-hints:empty { display: none; }
+.gift-surprise-hints > li { padding: 16px 18px; border: 1px solid #ded2b7; border-radius: 4px; background: #fffaf0; overflow-wrap: anywhere; }
+.gift-surprise-hints .eyebrow { color: var(--red); font-size: 8px; letter-spacing: 1.5px; }
+.gift-surprise-hints p { margin-top: 6px; font-family: var(--serif); font-size: 24px; line-height: 1.3; }
+.gift-surprise-next { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; margin-top: 20px; padding: 12px 20px; border: 1px solid var(--pine); border-radius: 4px; background: var(--pine); color: var(--paper); font-size: 12px; }
+.gift-surprise-next:hover { background: #395845; }
+.gift-surprise-next svg { width: 16px; height: 16px; flex-shrink: 0; }
+.gift-surprise-reveal { margin-top: 20px; padding: 22px 18px; border: 1px solid #c8b07c; border-radius: 4px; background: #f9f1dc; overflow-wrap: anywhere; }
+.gift-surprise-reveal:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+.gift-surprise-reveal > svg { width: 28px; height: 28px; margin: 0 auto; color: var(--red); }
+.gift-surprise-reveal h4 { margin: 12px 0; font-family: var(--serif); font-size: 32px; font-weight: 500; line-height: 1.1; color: var(--red); text-wrap: balance; }
+.gift-surprise-reveal > p { font-family: var(--serif); font-size: 23px; line-height: 1.4; text-wrap: pretty; }
+.gift-surprise-reveal > .gift-surprise-timing { margin-top: 18px; padding-top: 16px; border-top: 1px solid #ddcfaa; font-family: inherit; color: #626b5b; font-size: 12px; line-height: 1.8; }
+
 .reveal-letter--game { justify-content: flex-start; padding-top: 48px; }
 .reveal-letter--game > .reveal-art { display: none; }
 .reveal-letter--game > .eyebrow { margin-bottom: 7px; }
@@ -384,6 +402,12 @@
   .date-invitation-venue { font-size: 32px; }
   .date-invitation-text { font-size: 20px; }
   .date-invitation-choice, .date-invitation-timing { font-size: 11px; }
+  .gift-surprise { margin-top: 23px; padding: 20px 16px; }
+  .gift-surprise-hints > li { padding: 14px; }
+  .gift-surprise-hints p, .gift-surprise-reveal > p { font-size: 22px; }
+  .gift-surprise-reveal { padding: 20px 14px; }
+  .gift-surprise-reveal h4 { font-size: 30px; }
+  .gift-surprise-reveal > .gift-surprise-timing { font-size: 11px; }
   .reveal-letter--game { padding: 58px 18px 26px; }
   .reveal-letter--game h2 { font-size: 37px; margin-top: 0; }
   .reveal-letter--game > .reveal-message { font-size: 11px; margin-top: 8px; }
