@@ -18,6 +18,12 @@ export type AdventSleighGame = {
   resultMessage: string
 }
 
+export type AdventDateInvitation = {
+  venue: string
+  choice: string
+  timing: string
+}
+
 export type AdventDay = {
   day: number
   theme: Theme
@@ -29,6 +35,7 @@ export type AdventDay = {
   letter?: AdventLetter
   activity?: AdventActivity
   sleighGame?: AdventSleighGame
+  dateInvitation?: AdventDateInvitation
 }
 
 export const adventDays: AdventDay[] = [
@@ -78,7 +85,20 @@ export const adventDays: AdventDay[] = [
     },
   },
   { day: 4, theme: 'olive', pattern: 'stripes', art: 'ornament', title: 'Perfekt på vores måde', message: 'En perfekt planlagt aften er dejlig. Men en aften uden planer sammen med dig? Det er som regel min favorit. Det bedste er at være sammen.', littleJoy: 'Du vælger aftensmaden i dag. Jeg tager mig af resten.' },
-  { day: 5, theme: 'cranberry', pattern: 'plain', art: 'tree', title: 'Lidt plads til glæde', message: 'Lad os hylde de små ting: dit smil, en god sang, varme hænder og at komme hjem til hinanden. Det er dem, der gør livet stort.', littleJoy: 'Lad os sætte julemusik på og lave absolut ingenting nyttigt.' },
+  {
+    day: 5,
+    theme: 'cranberry',
+    pattern: 'plain',
+    art: 'heart',
+    title: 'En varm lille date',
+    message: 'Under guldlaget gemmer der sig en invitation til dig. Skrab den fri med fingeren, eller tryk på knappen, hvis du ikke kan vente.',
+    littleJoy: 'Jeg inviterer dig på en hyggelig date med varm chokolade. Bare dig og mig, kolde kinder og en kop, der varmer hænderne.',
+    dateInvitation: {
+      venue: 'På Peter Beier',
+      choice: 'Du vælger helt selv, hvilken varm chokolade du vil have. Mørk, mild, med flødeskum eller noget helt tredje. Det er din tur.',
+      timing: 'Vi behøver ikke tage afsted i dag. Vi finder en dag sammen, der passer os begge.',
+    },
+  },
   { day: 6, theme: 'cream', pattern: 'stars', art: 'gift', title: 'Den sødeste gave', message: 'Hvis jeg kunne pakke den følelse ind, som du giver mig, ville det være den bedste gave under træet. Tak, fordi du er helt og vidunderligt dig selv.', littleJoy: 'Der skal noget sødt til. Skal vi bage julesmåkager?' },
   { day: 7, theme: 'olive', pattern: 'snow', art: 'snowflake', title: 'Helt din egen', message: 'Ligesom et snefnug findes der ingen helt som dig. Og blandt alle mennesker i verden er jeg så glad for, at netop vi fandt hinanden.', littleJoy: 'Fortæl mig én lille ting, du godt kunne tænke dig, at vi laver sammen denne vinter.' },
   { day: 8, theme: 'pine', pattern: 'plain', art: 'bow', title: 'En dag til hygge', message: 'Verden må beholde sine travle planer i dag. Jeg vil hellere være et varmt sted sammen med dig og gøre en helt almindelig aften til et lille minde.', littleJoy: 'Filmaften i en tæppehule. Ekstra tæpper og ekstra lækkerier.' },

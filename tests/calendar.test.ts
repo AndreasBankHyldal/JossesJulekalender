@@ -36,6 +36,16 @@ test('December 2 has a complete cozy evening activity with flexible timing', () 
   assert.equal(adventDays.filter((day) => day.activity).length, 1)
 })
 
+test('December 5 invites to a hot chocolate date at Peter Beier with a free choice', () => {
+  const day = adventDays[4]
+  assert.ok(day.dateInvitation)
+  assert.equal(day.dateInvitation.venue, 'På Peter Beier')
+  assert.match(day.littleJoy, /varm chokolade/)
+  assert.match(day.dateInvitation.choice, /Du vælger helt selv, hvilken varm chokolade/)
+  assert.ok(day.dateInvitation.timing.trim())
+  assert.equal(adventDays.filter((advent) => advent.dateInvitation).length, 1)
+})
+
 test('doors are locked before December of the configured year', () => {
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR - 1, 11, 24)), 0)
   assert.equal(getUnlockedDay(new Date(CALENDAR_YEAR, 9, 27)), 0)

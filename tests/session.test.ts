@@ -107,3 +107,33 @@ test('malformed sleigh game content produces an explicit login error', async (co
     })
   }
 })
+
+test('login accepts the hot chocolate invitation while days without it remain compatible', async (context) => {
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'josse', days: adventDays }))
+  const session = await login('test-user', 'test-password')
+  assert.ok(session.days[4].dateInvitation)
+  assert.deepEqual(session.days[4].dateInvitation, adventDays[4].dateInvitation)
+  assert.equal(session.days[3].dateInvitation, undefined)
+})
+
+test('malformed date invitations produce an explicit login error', async (context) => {
+  let dateInvitation: unknown
+  context.mock.method(globalThis, 'fetch', async () => Response.json({
+    role: 'josse',
+    days: adventDays.map((day) => day.day === 5 ? { ...day, dateInvitation } : day),
+  }))
+  for (dateInvitation of [
+    null,
+    {},
+    { venue: 5, choice: 'Any hot chocolate', timing: 'Whenever suits us' },
+    { venue: ' ', choice: 'Any hot chocolate', timing: 'Whenever suits us' },
+    { venue: 'Peter Beier', choice: null, timing: 'Whenever suits us' },
+    { venue: 'Peter Beier', choice: ' ', timing: 'Whenever suits us' },
+    { venue: 'Peter Beier', choice: 'Any hot chocolate', timing: [] },
+    { venue: 'Peter Beier', choice: 'Any hot chocolate', timing: ' ' },
+  ]) {
+    await assert.rejects(login('test-user', 'test-password'), {
+      message: 'Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.',
+    })
+  }
+})
