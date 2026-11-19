@@ -11,6 +11,7 @@ export type AdventLetter = {
 export type AdventActivity = {
   essentials: string[]
   timing: string
+  illustration?: 'winter-walk'
 }
 
 export type AdventSleighGame = {
@@ -125,7 +126,20 @@ export const adventDays: AdventDay[] = [
       revealMessage: 'Overraskelse! Snacks og ansigtsmasker til en hyggelig lille spa-aften. Åbn din gave, find dig godt til rette, og nyd lidt velfortjent forkælelse.',
     },
   },
-  { day: 8, theme: 'pine', pattern: 'plain', art: 'bow', title: 'En dag til hygge', message: 'Verden må beholde sine travle planer i dag. Jeg vil hellere være et varmt sted sammen med dig og gøre en helt almindelig aften til et lille minde.', littleJoy: 'Filmaften i en tæppehule. Ekstra tæpper og ekstra lækkerier.' },
+  {
+    day: 8,
+    theme: 'pine',
+    pattern: 'plain',
+    art: 'sprig',
+    title: 'En gåtur med dig',
+    message: 'Mousis, jeg inviterer dig på en rolig gåtur med et hyggeligt caféstop undervejs. Lidt frisk luft, din hånd i min og tid sammen væk fra læsebøgerne.',
+    littleJoy: 'Vi går en tur sammen og finder en hyggelig café undervejs. Du vælger kaffe, kage eller begge dele. Jeg glæder mig bare til at være sammen med dig.',
+    activity: {
+      essentials: ['En rolig gåtur sammen', 'Et hyggeligt caféstop', 'Kaffe, kage eller begge dele', 'Rute og café vælger vi sammen'],
+      timing: 'Det behøver ikke være den 8. december. Vi aftaler rute, café og tidspunkt sammen senere, når det passer os begge. Ingen fast varighed og intet, du skal nå.',
+      illustration: 'winter-walk',
+    },
+  },
   { day: 9, theme: 'cream', pattern: 'stripes', art: 'heart', title: 'Bare en lille påmindelse', message: 'På de gode dage og på de knap så gode dage er du elsket. Ikke på grund af det, du gør, eller hvor meget du når. Bare fordi du er dig.', littleJoy: 'Et rigtig langt kram. Helt uden nogen særlig grund.' },
   { day: 10, theme: 'cranberry', pattern: 'snow', art: 'star', title: 'Et ønske for dig', message: 'Jeg håber, at denne december giver dig den samme varme og glæde, som du bringer ind i mit liv. Og en lille smule magi, du ikke havde set komme.', littleJoy: 'Lad os hver skrive et ønske ned for det kommende år.' },
   { day: 11, theme: 'olive', pattern: 'plain', art: 'sprig', title: 'Et lille eventyr', message: 'Vi behøver ikke rejse langt for at skabe et minde. En ny lille gade, en varm kop kaffe og din hånd i min. Det er et ret dejligt eventyr.', littleJoy: 'Lad os finde en hyggelig café og bestille noget, vi ikke har prøvet før.' },

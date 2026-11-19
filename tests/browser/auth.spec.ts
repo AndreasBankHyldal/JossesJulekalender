@@ -14,6 +14,8 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
   if (!dateInvitation) throw new Error('December 5 must have a date invitation')
   const giftSurprise = adventDays[6].giftSurprise
   if (!giftSurprise) throw new Error('December 7 must have a gift surprise')
+  const walkActivity = adventDays[7].activity
+  if (!walkActivity) throw new Error('December 8 must have a walk and cafe activity')
   await page.goto('/')
   await expect(page.getByLabel('Brugernavn', { exact: true })).toBeVisible()
   await expect(page.locator('.calendar-door')).toHaveCount(0)
@@ -25,6 +27,7 @@ test('anonymous visitors see only login and cannot fetch private notes', async (
     adventDays[2].message, sleighGame.instructions, sleighGame.resultMessage,
     adventDays[4].message, adventDays[4].littleJoy, dateInvitation.choice, dateInvitation.timing,
     adventDays[6].message, adventDays[6].littleJoy, ...giftSurprise.hints, giftSurprise.revealTitle, giftSurprise.revealMessage,
+    adventDays[7].message, adventDays[7].littleJoy, ...walkActivity.essentials, walkActivity.timing,
   ]
   const anonymousBody = await response.text()
   for (const privateText of privateContent) expect(anonymousBody).not.toContain(privateText)
