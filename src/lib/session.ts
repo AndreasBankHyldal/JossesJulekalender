@@ -17,7 +17,8 @@ function isActivity(value: unknown): value is AdventActivity {
   return isRecord(value) &&
     Array.isArray(value.essentials) && value.essentials.length > 0 &&
     value.essentials.every((item) => typeof item === 'string' && item.trim().length > 0) &&
-    typeof value.timing === 'string' && value.timing.trim().length > 0
+    typeof value.timing === 'string' && value.timing.trim().length > 0 &&
+    (value.illustration === undefined || value.illustration === 'winter-walk')
 }
 
 function isSleighGame(value: unknown): value is AdventSleighGame {

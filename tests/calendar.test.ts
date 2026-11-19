@@ -33,7 +33,7 @@ test('December 2 has a complete cozy evening activity with flexible timing', () 
   assert.ok(activity)
   assert.deepEqual(activity.essentials, ['Julefilm', 'Dyner og tæpper', 'Dine yndlingssnacks', 'Varm kakao'])
   assert.ok(activity.timing.trim())
-  assert.equal(adventDays.filter((day) => day.activity).length, 1)
+  assert.deepEqual(adventDays.filter((day) => day.activity).map(({ day }) => day), [2, 8])
 })
 
 test('December 5 invites to a hot chocolate date at Peter Beier with a free choice', () => {
@@ -58,6 +58,23 @@ test('December 7 has the three supplied hints and a Danish snacks-and-face-masks
   assert.match(day.giftSurprise.revealMessage, /Åbn din gave/)
   assert.match(day.littleJoy, /intet, du skal nå i dag/)
   assert.equal(adventDays.filter((advent) => advent.giftSurprise).length, 1)
+})
+
+test('December 8 invites to a walk and cafe stop with free choice and flexible plans', () => {
+  const day = adventDays[7]
+  assert.ok(day.activity)
+  assert.match(day.message, /Mousis, jeg inviterer dig på en rolig gåtur med et hyggeligt caféstop/)
+  assert.match(day.littleJoy, /kaffe, kage eller begge dele/)
+  assert.deepEqual(day.activity.essentials, [
+    'En rolig gåtur sammen',
+    'Et hyggeligt caféstop',
+    'Kaffe, kage eller begge dele',
+    'Rute og café vælger vi sammen',
+  ])
+  assert.match(day.activity.timing, /behøver ikke være den 8\. december/)
+  assert.match(day.activity.timing, /aftaler rute, café og tidspunkt sammen senere/)
+  assert.match(day.activity.timing, /Ingen fast varighed/)
+  assert.equal(day.activity.illustration, 'winter-walk')
 })
 
 test('doors are locked before December of the configured year', () => {

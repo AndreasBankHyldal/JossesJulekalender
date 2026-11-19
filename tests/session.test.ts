@@ -48,6 +48,13 @@ test('login accepts the cozy activity from the authenticated payload', async (co
   assert.deepEqual(session.days[1].activity, adventDays[1].activity)
 })
 
+test('login accepts the walk invitation and its illustration from the authenticated payload', async (context) => {
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'josse', days: adventDays }))
+  const session = await login('test-user', 'test-password')
+  assert.ok(session.days[7].activity)
+  assert.deepEqual(session.days[7].activity, adventDays[7].activity)
+})
+
 test('days without an activity retain the existing session format', async (context) => {
   const days = adventDays.map((day) => ({ ...day, activity: undefined }))
   context.mock.method(globalThis, 'fetch', async () => Response.json({ role: 'admin', days }))
@@ -71,6 +78,9 @@ test('malformed activities produce an explicit login error', async (context) => 
     { essentials: [' '], timing: 'Whenever we have time' },
     { essentials: ['Movies'], timing: null },
     { essentials: ['Movies'], timing: ' ' },
+    { essentials: ['Movies'], timing: 'Whenever we have time', illustration: null },
+    { essentials: ['Movies'], timing: 'Whenever we have time', illustration: 8 },
+    { essentials: ['Movies'], timing: 'Whenever we have time', illustration: 'unknown' },
   ]) {
     await assert.rejects(login('test-user', 'test-password'), {
       message: 'Kalenderen modtog et uventet svar fra serveren. Prøv at logge ind igen.',
