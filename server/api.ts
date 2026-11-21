@@ -1,11 +1,11 @@
 import { adventDays } from '../src/data/advent.ts'
 import type { AccountRole, CalendarSession } from '../src/types/session.ts'
 import {
-  authenticate, AuthConfigurationError, createSession,
+  authenticate, AuthConfigurationError, createSession, equalSecret,
   readAuthConfig, sessionCookie, sessionFromCookie,
 } from './auth.ts'
 import { json } from './http.ts'
-import { handleSleighScores } from './sleigh-scores.ts'
+import { createScoreStore, handleSleighScores, ScoreConfigurationError } from './sleigh-scores.ts'
 import type { SleighScoreStore } from './sleigh-scores.ts'
 
 export async function handleApi(
@@ -13,7 +13,25 @@ export async function handleApi(
   env: Record<string, string | undefined> = process.env,
   localScores?: SleighScoreStore,
 ): Promise<Response> {
-  if (new URL(request.url).searchParams.get('resource') === 'sleigh-game') return handleSleighScores(request, env, localScores)
+  const resource = new URL(request.url).searchParams.get('resource')
+  if (resource === 'sleigh-game') return handleSleighScores(request, env, localScores)
+  if (resource === 'keep-alive') {
+    if (request.method !== 'GET') return json({ error: 'Denne metode er ikke tilladt.' }, 405, { Allow: 'GET' })
+    if (!env.CRON_SECRET) {
+      console.error('Databasekontrol mangler CRON_SECRET.')
+      return json({ error: 'Databasekontrol mangler konfiguration.' }, 503)
+    }
+    if (!equalSecret(request.headers.get('authorization') ?? '', `Bearer ${env.CRON_SECRET}`)) {
+      return json({ error: 'Ikke tilladt.' }, 401)
+    }
+    try {
+      await createScoreStore(env).read()
+      return json({ ok: true })
+    } catch (error) {
+      console.error('Databasekontrol fejlede:', error instanceof Error ? error.name : 'Ukendt fejl')
+      return json({ error: 'Databasekontrol fejlede.' }, error instanceof ScoreConfigurationError ? 503 : 502)
+    }
+  }
   const secure = new URL(request.url).protocol === 'https:'
   if (request.method !== 'GET') {
     const origin = request.headers.get('origin')

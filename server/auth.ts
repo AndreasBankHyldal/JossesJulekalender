@@ -25,7 +25,7 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
   return config
 }
 
-function equalSecret(left: string, right: string): boolean {
+export function equalSecret(left: string, right: string): boolean {
   return timingSafeEqual(
     createHash('sha256').update(left).digest(),
     createHash('sha256').update(right).digest(),

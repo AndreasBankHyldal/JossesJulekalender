@@ -107,6 +107,42 @@ test('configuration and storage failures do not look like successfully loaded re
   assert.ok('error' in await failed.json())
 })
 
+test('scheduled database check requires a secret and performs a read without changing records', async (context) => {
+  const env = { ...redisEnv, CRON_SECRET: 'fictional-cron-secret' }
+  const request = (authorization?: string, method = 'GET') => new Request('https://calendar.test/api?resource=keep-alive', {
+    method, headers: authorization ? { Authorization: authorization } : {},
+  })
+  context.mock.method(console, 'error', () => {})
+  let calls = 0
+  context.mock.method(globalThis, 'fetch', async (_input: unknown, init: RequestInit) => {
+    calls++
+    assert.deepEqual(JSON.parse(String(init.body)), [
+      'zmscore', 'josses:sleigh-game:production:2026',
+      'admin:presents', 'admin:durationMs', 'josse:presents', 'josse:durationMs',
+    ])
+    return Response.json({ result: [null, null, null, null] })
+  })
+  assert.equal((await handleApi(request(), env)).status, 401)
+  assert.equal((await handleApi(request('Bearer wrong'), env)).status, 401)
+  assert.equal((await handleApi(request('Bearer fictional-cron-secret'), redisEnv)).status, 503)
+  assert.equal((await handleApi(request('Bearer fictional-cron-secret', 'POST'), env)).status, 405)
+  assert.equal(calls, 0)
+  const response = await handleApi(request('Bearer fictional-cron-secret'), env)
+  assert.equal(response.status, 200)
+  assert.deepEqual(await response.json(), { ok: true })
+  assert.equal(calls, 1)
+  assert.equal((await handleApi(request('Bearer fictional-cron-secret'), { CRON_SECRET: env.CRON_SECRET })).status, 503)
+})
+
+test('scheduled database check reports Redis failures', async (context) => {
+  context.mock.method(console, 'error', () => {})
+  context.mock.method(globalThis, 'fetch', async () => Response.json({ error: 'Test failure' }))
+  const response = await handleApi(new Request('https://calendar.test/api?resource=keep-alive', {
+    headers: { Authorization: 'Bearer fictional-cron-secret' },
+  }), { ...redisEnv, CRON_SECRET: 'fictional-cron-secret' })
+  assert.equal(response.status, 502)
+})
+
 test('local records survive reloads and concurrent writes without reducing either best', async (context) => {
   const directory = await mkdtemp(join(tmpdir(), 'josses-sleigh-'))
   context.after(() => rm(directory, { recursive: true, force: true }))

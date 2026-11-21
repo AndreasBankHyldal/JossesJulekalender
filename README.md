@@ -58,6 +58,8 @@ Hver afsluttet tur gemmer to uafhængige personlige rekorder: flest gaver og læ
 
 Forbind Upstash Redis til Vercel-projektet. Serveren bruger `KV_REST_API_URL` og `KV_REST_API_TOKEN` (eller `UPSTASH_REDIS_REST_URL` og `UPSTASH_REDIS_REST_TOKEN`). Brug ikke en read-only-token til lagring, og tilføj aldrig `VITE_` til navnene. Production, Preview og Development får hver deres nøgle under `josses:sleigh-game:<miljø>:<år>`, så test ikke ændrer de rigtige rekorder. Begge værdier opdateres atomisk med Redis `ZADD GT`. Ingen oprydning eller udløbsdato nulstiller rekorderne. Kanespillet bruger en separat nøgle fra det tidligere snefnugspil, hvis der findes gamle testresultater.
 
+For at undgå inaktivitet læser et Vercel Cron-job fra Redis én gang dagligt uden at ændre rekorderne. Tilføj en unik `CRON_SECRET` som hemmelig miljøvariabel for Production i Vercel (generer den f.eks. med `openssl rand -hex 32`), og udgiv igen. Vercel sender hemmeligheden til jobbet automatisk. Jobbet kører kun for Production; kontrollér dets status og eventuelle fejl i Vercels Cron- og funktionslogs. Hvis databasen allerede er arkiveret, skal den først gendannes i Vercel. Jobbet kan ikke garantere mod arkivering, hvis kald eller databaseforbindelse fejler.
+
 Dette er en venskabelig konkurrence, ikke et snydesikkert ranglistesystem: Serveren kontrollerer login, spilleridentitet og at begge værdier er ikke-negative, sikre heltal; selve spillet kører i browseren.
 
 ### Lokal spiltest uden database
@@ -107,8 +109,8 @@ Login og spilrekorder bruger én lille Node.js-funktion i `api/index.ts`, som ka
 1. Skub dette lokale Git-repository til et GitHub-repository.
 2. Importer repositoryet i Vercel, og vælg **Vite** som projektindstilling.
 3. Behold `npm run build` som byggekommando og `dist` som outputmappe.
-4. Tilføj alle fem variabler fra `.env.example` under **Settings → Environment Variables** i Vercel. Brug dine egne værdier som hemmelige variabler, uden `VITE_`-præfiks. Den ignorerede lokale `.env` følger ikke automatisk med til Vercel.
+4. Tilføj de fem loginvariabler fra `.env.example` under **Settings → Environment Variables** i Vercel. Brug dine egne værdier som hemmelige variabler, uden `VITE_`-præfiks. Den ignorerede lokale `.env` følger ikke automatisk med til Vercel.
 5. Udgiv siden. Udgiv igen, når du ændrer miljøvariablerne i Vercel.
-6. For fælles spilrekorder: Forbind Upstash Redis fra Storage til Production og Preview, og kontrollér, at de to `KV_REST_API_*`-variabler er tilføjet. Tilføj Development til forbindelsen, hvis det normale lokale udviklingsmiljø også skal bruge Redis. Den særskilte `npm run dev:game` bruger kun lokale testrekorder.
+6. For fælles spilrekorder: Forbind Upstash Redis fra Storage til Production og Preview, og kontrollér, at de to `KV_REST_API_*`-variabler er tilføjet. Tilføj en unik `CRON_SECRET` til Production, og udgiv igen for at aktivere den daglige databasekontrol. Tilføj Development til databaseforbindelsen, hvis det normale lokale udviklingsmiljø også skal bruge Redis. Den særskilte `npm run dev:game` bruger kun lokale testrekorder.
 
 Siden bruger rodruten og API-ruten `/api`, så der er ikke brug for en SPA-omskrivningskonfiguration. Kør `npm run build` efterfulgt af `npm run preview` for at se produktionsversionen lokalt; Vite-tilføjelsen bruger samme API-kode som Vercel-funktionen.
